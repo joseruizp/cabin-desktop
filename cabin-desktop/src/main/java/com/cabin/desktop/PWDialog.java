@@ -3,6 +3,7 @@ package com.cabin.desktop;
 import java.awt.AWTException;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -14,17 +15,21 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 
 public class PWDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
     private static final String pw = "123456";
-    private JPasswordField pwField;
+    private PlaceholderPasswordField pwField;
+    private PlaceholderTextField txField;
+    private JButton loginBtn;
     private JPanel mainPanel;
     private JPanel pwMainPanel;
     private ImagePanel imagePanel;
@@ -46,29 +51,47 @@ public class PWDialog extends JDialog implements ActionListener {
 
             public void paintComponent(Graphics g) {
                 try {
-                    Image img = ImageIO.read(getClass().getResource("/images/background.jpg"));
+                    Image img = ImageIO.read(getClass().getResource("/images/login-background.jpg"));
                     g.drawImage(img, 0, 0, null);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
-        pwPanel.setSize(new Dimension(259, 180));
+        pwPanel.setSize(new Dimension(555, 591));
         pwPanel.setLayout(new BoxLayout(pwPanel, 1));
 
-        pwField = new JPasswordField(10);
+        pwField = new PlaceholderPasswordField(10);
+        pwField.setPlaceholder("Password");
         pwField.setAlignmentX(0.5F);
-        pwField.setMaximumSize(pwField.getPreferredSize());
-        pwField.addActionListener(this);
+        pwField.setMaximumSize(new Dimension(319, 55));
+        
+        txField = new PlaceholderTextField(10);
+        txField.setPlaceholder("Email");
+        txField.setAlignmentX(0.5F);
+        txField.setMaximumSize(new Dimension(319, 55));
+        
+        ImageIcon myImage = new ImageIcon(getClass().getResource("/images/login-button.jpg"));
+        loginBtn = new JButton(myImage);
+        loginBtn.setAlignmentX(0.5F);
+        loginBtn.setOpaque(false);
+        loginBtn.setContentAreaFilled(false);
+        loginBtn.setBorderPainted(false);
+        loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        loginBtn.addActionListener(this);
 
-        pwPanel.add(Box.createRigidArea(new Dimension(259, 120)));
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 222)));
+        pwPanel.add(txField);
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 21)));
         pwPanel.add(pwField);
-        pwPanel.add(Box.createRigidArea(new Dimension(1, 50)));
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 21)));
+        pwPanel.add(loginBtn);
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 200)));
 
         pwMainPanel = new JPanel();
         pwMainPanel.setBackground(new Color(1.0F, 1.0F, 1.0F, 0.0F));
         pwMainPanel.setLayout(new BoxLayout(pwMainPanel, 1));
-        pwMainPanel.add(Box.createRigidArea(new Dimension(getToolkit().getScreenSize().width, getToolkit().getScreenSize().height / 2 - 90)));
+        pwMainPanel.add(Box.createRigidArea(new Dimension(getToolkit().getScreenSize().width, getToolkit().getScreenSize().height / 2 - 300)));
         pwMainPanel.add(pwPanel);
 
         imagePanel = new ImagePanel("/images/Locked.jpg", new Dimension(259, 180));
@@ -127,7 +150,7 @@ public class PWDialog extends JDialog implements ActionListener {
         t.schedule(new TimerTask() {
             public void run() {
                 PWDialog.instance.dispose();
-                PWLauncher.toggleIcon();
+//                PWLauncher.toggleIcon();
                 security.stop();
             }
         }, 2000L);
@@ -160,12 +183,13 @@ public class PWDialog extends JDialog implements ActionListener {
     public void showPanel(String title) {
         CardLayout cl = (CardLayout) mainPanel.getLayout();
         cl.show(mainPanel, title);
-        if (title.equals("Card with Password Field"))
-            pwField.requestFocus();
     }
 
-    public void actionPerformed(ActionEvent e) {
-        if (checkPassword(e.getActionCommand())) {
+    @SuppressWarnings("deprecation")
+	public void actionPerformed(ActionEvent e) {
+    	String email = txField.getText();
+    	String password = pwField.getText();
+        if (checkPassword(password)) {
             accept();
         } else
             deny();

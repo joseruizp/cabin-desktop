@@ -1,12 +1,10 @@
 package com.cabin.desktop;
 
-import java.awt.Robot;
 import java.awt.Window;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JFrame;
+import java.io.IOException;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 public class WindowsSecurity implements Runnable {
     private Window frame;
@@ -20,6 +18,7 @@ public class WindowsSecurity implements Runnable {
 
     public void stop() {
         this.running = false;
+        startExplorer();
     }
 
     public void run() {
@@ -53,6 +52,14 @@ public class WindowsSecurity implements Runnable {
             Runtime.getRuntime().exec("taskkill /F /IM " + string).waitFor();
         } catch (Exception e) {
         }
+    }
+    
+    private void startExplorer() {
+    	try {
+			Runtime.getRuntime().exec("explorer.exe");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     private void launch(String string) {
