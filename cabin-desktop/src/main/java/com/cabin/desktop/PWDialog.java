@@ -22,6 +22,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class PWDialog extends JDialog implements ActionListener {
@@ -120,7 +121,7 @@ public class PWDialog extends JDialog implements ActionListener {
 
         setContentPane(mainPanel);
         setPreferredSize(getToolkit().getScreenSize());
-        setDefaultCloseOperation(0);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setFocusable(true);
         setResizable(false);
         setAlwaysOnTop(true);
@@ -129,6 +130,7 @@ public class PWDialog extends JDialog implements ActionListener {
         pack();
         setVisible(true);
         requestFocus();
+        
         security = new WindowsSecurity(this);
     }
 
@@ -150,7 +152,6 @@ public class PWDialog extends JDialog implements ActionListener {
         t.schedule(new TimerTask() {
             public void run() {
                 PWDialog.instance.dispose();
-//                PWLauncher.toggleIcon();
                 security.stop();
             }
         }, 2000L);
