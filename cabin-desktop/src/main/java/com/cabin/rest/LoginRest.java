@@ -43,7 +43,7 @@ public class LoginRest {
 			return client;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new com.cabin.entity.Client();
+			return null;
 		}
 	}
 }

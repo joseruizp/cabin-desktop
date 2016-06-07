@@ -25,6 +25,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.cabin.entity.Client;
+import com.cabin.rest.LoginRest;
+
 public class PWDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
     private static final String pw = "123456";
@@ -190,10 +193,17 @@ public class PWDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
     	String email = txField.getText();
     	String password = pwField.getText();
-        if (checkPassword(password)) {
-            accept();
-        } else
-            deny();
+    	
+    	LoginRest loginRest = new LoginRest();
+    	Client client = loginRest.login(email, password);
+    	
+    	if (client != null) {
+    		System.out.println("loggin successfull");
+    		accept();
+    	} else {
+    		System.out.println("login failed");
+    		deny();
+    	}
     }
 
     public static void main(String[] args) throws AWTException {
