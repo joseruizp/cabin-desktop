@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -25,7 +26,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.cabin.common.PropertiesLoader;
 import com.cabin.entity.Client;
+import com.cabin.entity.Computer;
+import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
 
 public class PWDialog extends JDialog implements ActionListener {
@@ -44,11 +48,14 @@ public class PWDialog extends JDialog implements ActionListener {
     public static boolean accepting;
     public static boolean denying;
     public static PWDialog instance;
+    private PropertiesLoader propertiesLoader;
+    private static final String PROPERTIES_FILE_NAME = "datos.properties";
 
     public PWDialog() {
         accepting = false;
         denying = false;
         SCREENDIM = getToolkit().getScreenSize();
+        propertiesLoader = new PropertiesLoader(PROPERTIES_FILE_NAME);
 
         JPanel pwPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
@@ -145,16 +152,19 @@ public class PWDialog extends JDialog implements ActionListener {
         pwField.setText(null);
     }
 
-    public void accept() {
+    public void accept(final Client client) {
         accepting = true;
 
         imagePanel.setImage("/images/Unlocked.jpg", new Dimension(259, 180));
         showPanel("Card with Images");
 
+        final Dialog thisDialog = this;
+        final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
-                PWDialog.instance.dispose();
+//                PWDialog.instance.dispose();
+            	new FormDialog(thisDialog, client, computer);
                 security.stop();
             }
         }, 2000L);
@@ -199,7 +209,7 @@ public class PWDialog extends JDialog implements ActionListener {
     	
     	if (client != null) {
     		System.out.println("loggin successfull");
-    		accept();
+    		accept(client);
     	} else {
     		System.out.println("login failed");
     		deny();
