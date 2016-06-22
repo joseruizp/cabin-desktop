@@ -5,10 +5,18 @@
 package com.cabin.desktop;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.List;
+
 import javax.swing.*;
 
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
+import com.cabin.entity.PunctuationRule;
+import com.cabin.rest.RentRest;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 
@@ -20,17 +28,19 @@ public class FormDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private Client client;
 	private Computer computer;
+	private List<PunctuationRule> rules;
 	
 	public FormDialog(Frame owner) {
 		super(owner);
 		initComponents();
 	}
 
-	public FormDialog(Dialog owner, Client client, Computer computer) {
+	public FormDialog(Dialog owner, Client client, Computer computer, List<PunctuationRule> rules) {
 		super(owner);
 		System.out.println("in FormDialog");
 		this.client = client;
 		this.computer = computer;
+		this.rules = rules;
 		initComponents();
 	}
 
@@ -55,13 +65,15 @@ public class FormDialog extends JDialog {
 		newPointsTextField = new JTextField();
 		bonificationLabel = new JLabel();
 		bonificationValueLabel = new JTextField();
-		exchangeLabel = new JLabel();
+		viewBonus = new JButton();
 		rentTypeLabel = new JLabel();
-		rentTypeTextField = new JTextField();
+		timeLabel = new JLabel();
+		timeTextField = new JTextField();
 		rentTypeCombobox = new JComboBox();
 		priceLabel = new JLabel();
 		priceTextField = new JTextField();
 		rentButton = new JButton();
+		rentAndExchangeButton = new JButton();
 		cancelButton = new JButton();
 
 		//======== this ========
@@ -119,29 +131,61 @@ public class FormDialog extends JDialog {
 		bonificationLabel.setText("Bonificacion:");
 		contentPane.add(bonificationLabel, CC.xy(6, 7));
 		contentPane.add(bonificationValueLabel, CC.xy(7, 7));
-
-		//---- label10 ----
-		exchangeLabel.setText("Canjear");
-		contentPane.add(exchangeLabel, CC.xy(8, 7));
+		
+		viewBonus.setText("Ver");
+		contentPane.add(viewBonus, CC.xy(9, 7));
+		viewBonus.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String point = newPointsTextField.getText();
+//				for (PunctuationRule rule : rules) {
+//					rule.
+//				}
+//				rules.
+			}
+		});
 
 		//---- label11 ----
 		rentTypeLabel.setText("Tipo Alquiler:");
 		contentPane.add(rentTypeLabel, CC.xy(2, 9));
-		contentPane.add(rentTypeTextField, CC.xy(3, 9));
-		contentPane.add(rentTypeCombobox, CC.xy(4, 9));
+		contentPane.add(rentTypeCombobox, CC.xy(3, 9));
+
+		//---- label11 ----
+		timeLabel.setText("Tiempo:");
+		contentPane.add(timeLabel, CC.xy(2, 11));
+		contentPane.add(timeTextField, CC.xy(3, 11));
 
 		//---- label12 ----
 		priceLabel.setText("Precio:");
-		contentPane.add(priceLabel, CC.xy(6, 9));
-		contentPane.add(priceTextField, CC.xy(7, 9));
+		contentPane.add(priceLabel, CC.xy(6, 11));
+		contentPane.add(priceTextField, CC.xy(7, 11));
 
 		//---- button1 ----
 		rentButton.setText("Alquilar");
-		contentPane.add(rentButton, CC.xy(4, 11));
+		rentButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RentRest rentRest = new RentRest();
+				String rentTime = timeTextField.getText();
+				rentRest.rentComputer(client.getId(), computer.getId(), rentTime);
+			}
+		});
+		contentPane.add(rentButton, CC.xy(4, 13));
+		
+		rentAndExchangeButton.setText("Alquilar y Canjear");
+		rentAndExchangeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String points = newPointsTextField.getText();
+				
+				
+				RentRest rentRest = new RentRest();
+				String rentTime = timeTextField.getText();
+				rentRest.rentComputer(client.getId(), computer.getId(), rentTime);
+			}
+		});
+		contentPane.add(rentAndExchangeButton, CC.xy(6, 13));
 
 		//---- button2 ----
 		cancelButton.setText("Cancelar");
-		contentPane.add(cancelButton, CC.xy(6, 11));
+		contentPane.add(cancelButton, CC.xy(8, 13));
 		pack();
 		setLocationRelativeTo(getOwner());
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -169,13 +213,16 @@ public class FormDialog extends JDialog {
 	private JTextField newPointsTextField;
 	private JLabel bonificationLabel;
 	private JTextField bonificationValueLabel;
-	private JLabel exchangeLabel;
+	private JButton viewBonus;
 	private JLabel rentTypeLabel;
-	private JTextField rentTypeTextField;
 	private JComboBox rentTypeCombobox;
+	private JLabel timeLabel;
+	private JTextField timeTextField;
 	private JLabel priceLabel;
 	private JTextField priceTextField;
 	private JButton rentButton;
+	private JButton rentAndExchangeButton;
 	private JButton cancelButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
+
 }

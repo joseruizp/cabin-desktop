@@ -11,7 +11,7 @@ public class RentRest {
 
 	private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
 
-	public void rentComputer(String clientId, String computerId, String rentTime) throws Exception {
+	public void rentComputer(Long clientId, Long computerId, String rentTime) {
 		ClientConfig clientConfig = new DefaultClientConfig();
 
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
