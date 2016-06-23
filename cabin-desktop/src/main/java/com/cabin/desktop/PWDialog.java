@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,10 +29,8 @@ import javax.swing.JPanel;
 import com.cabin.common.PropertiesLoader;
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
-import com.cabin.entity.PunctuationRule;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
-import com.cabin.rest.PunctuationRuleRest;
 
 public class PWDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -163,12 +160,11 @@ public class PWDialog extends JDialog implements ActionListener {
 
         final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
-        final List<PunctuationRule> rules = new PunctuationRuleRest().getPunctuations(client.getLevel().getId());
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
 //                PWDialog.instance.dispose();
-                new FormDialog(thisDialog, client, computer, rules);
+                new FormDialog(thisDialog, client, computer);
                 security.stop();
             }
         }, 2000L);

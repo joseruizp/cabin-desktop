@@ -4,21 +4,24 @@
 
 package com.cabin.desktop;
 
-import java.awt.*;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
-import com.cabin.entity.PunctuationRule;
+import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * @author jose ruiz
@@ -28,19 +31,17 @@ public class FormDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private Client client;
 	private Computer computer;
-	private List<PunctuationRule> rules;
 	
 	public FormDialog(Frame owner) {
 		super(owner);
 		initComponents();
 	}
 
-	public FormDialog(Dialog owner, Client client, Computer computer, List<PunctuationRule> rules) {
+	public FormDialog(Dialog owner, Client client, Computer computer) {
 		super(owner);
 		System.out.println("in FormDialog");
 		this.client = client;
 		this.computer = computer;
-		this.rules = rules;
 		initComponents();
 	}
 
@@ -136,11 +137,9 @@ public class FormDialog extends JDialog {
 		contentPane.add(viewBonus, CC.xy(9, 7));
 		viewBonus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String point = newPointsTextField.getText();
-//				for (PunctuationRule rule : rules) {
-//					rule.
-//				}
-//				rules.
+				int points = Integer.parseInt(newPointsTextField.getText());
+				Double balance = new PrizesRuleRest().getBonification(client.getLevel().getId(), points);
+				bonificationValueLabel.setText(String.valueOf(balance));
 			}
 		});
 
@@ -173,9 +172,6 @@ public class FormDialog extends JDialog {
 		rentAndExchangeButton.setText("Alquilar y Canjear");
 		rentAndExchangeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String points = newPointsTextField.getText();
-				
-				
 				RentRest rentRest = new RentRest();
 				String rentTime = timeTextField.getText();
 				rentRest.rentComputer(client.getId(), computer.getId(), rentTime);
