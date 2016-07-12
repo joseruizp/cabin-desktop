@@ -31,6 +31,7 @@ import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
+import com.cabin.rest.TariffRest;
 
 public class PWDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -160,11 +161,13 @@ public class PWDialog extends JDialog implements ActionListener {
 
         final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
+        final Long headquarterId = propertiesLoader.getLong("id_sede");
+        final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
 //                PWDialog.instance.dispose();
-                new FormDialog(thisDialog, client, computer);
+                new FormDialog(thisDialog, client, computer, tariff);
                 security.stop();
             }
         }, 2000L);

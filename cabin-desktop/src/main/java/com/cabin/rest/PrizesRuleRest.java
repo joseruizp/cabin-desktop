@@ -11,7 +11,7 @@ public class PrizesRuleRest {
 
 	private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
 
-	public Double getBonification(long id, int points) {
+	public String getBonification(long id, int points) {
 		ClientConfig clientConfig = new DefaultClientConfig();
 
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -30,6 +30,6 @@ public class PrizesRuleRest {
 
 		String output = response.getEntity(String.class);
 
-		return Double.parseDouble(output);
+		return output;
 	}
 }

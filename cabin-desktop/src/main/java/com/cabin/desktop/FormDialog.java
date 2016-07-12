@@ -6,7 +6,6 @@ package com.cabin.desktop;
 
 import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +31,7 @@ public class FormDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     private Client client;
     private Computer computer;
+    private Double tariff;
 
     private JLabel userLabel;
     private JLabel userValueLabel;
@@ -60,18 +60,18 @@ public class FormDialog extends JDialog {
     private JTextField priceTextField;
     private JButton rentButton;
     private JButton rentAndExchangeButton;
-    private JButton cancelButton;
 
     public FormDialog(Frame owner) {
         super(owner);
         initComponents();
     }
 
-    public FormDialog(Dialog owner, Client client, Computer computer) {
+    public FormDialog(Dialog owner, Client client, Computer computer, Double tariff) {
         super(owner);
         System.out.println("in FormDialog");
         this.client = client;
         this.computer = computer;
+        this.tariff = tariff;
         initComponents();
     }
 
@@ -103,7 +103,6 @@ public class FormDialog extends JDialog {
         priceTextField = new JTextField();
         rentButton = new JButton();
         rentAndExchangeButton = new JButton();
-        cancelButton = new JButton();
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout("30dlu, default, 50dlu, default, 15dlu, 50dlu, 69dlu:grow, default, 40dlu", "default, 13*(19dlu), 20dlu"));
@@ -135,6 +134,7 @@ public class FormDialog extends JDialog {
         contentPane.add(groupValueLabel, CC.xywh(3, 5, 2, 1));
 
         tariffLabel.setText("Tarifa:");
+        tariffValueLabel.setText(String.valueOf(tariff));
         contentPane.add(tariffLabel, CC.xy(6, 5));
         contentPane.add(tariffValueLabel, CC.xy(7, 5));
 
@@ -156,9 +156,9 @@ public class FormDialog extends JDialog {
                 System.out.println("entra viewBonus");
                 int points = Integer.parseInt(newPointsTextField.getText());
                 System.out.println("entra viewBonus, points: " + points);
-                Double balance = new PrizesRuleRest().getBonification(client.getLevel().getId(), points);
+                String balance = new PrizesRuleRest().getBonification(client.getLevel().getId(), points);
                 System.out.println("entra viewBonus, balance: " + balance);
-                bonificationValueLabel.setText(String.valueOf(balance));
+                bonificationValueLabel.setText(balance);
             }
         });
 
