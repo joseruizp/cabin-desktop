@@ -4,12 +4,16 @@
 
 package com.cabin.desktop;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -22,6 +26,9 @@ import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
 
 /**
  * @author jose ruiz
@@ -62,6 +69,9 @@ public class FormDialog extends JDialog {
     private JButton rentButton;
     private JButton rentAndExchangeButton;
 
+    /**
+     * @wbp.parser.constructor
+     */
     public FormDialog(Frame owner) {
         super(owner);
         initComponents();
@@ -107,8 +117,34 @@ public class FormDialog extends JDialog {
         rentAndExchangeButton = new JButton();
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout("30dlu, default, 50dlu, default, 15dlu, 50dlu, 69dlu:grow, default, 40dlu", "default, 13*(19dlu), 20dlu"));
+        contentPane.setLayout(new FormLayout(new ColumnSpec[] {
+        		ColumnSpec.decode("30dlu"),
+        		FormSpecs.DEFAULT_COLSPEC,
+        		ColumnSpec.decode("50dlu"),
+        		ColumnSpec.decode("max(48dlu;default)"),
+        		ColumnSpec.decode("19dlu"),
+        		ColumnSpec.decode("55dlu"),
+        		ColumnSpec.decode("98dlu"),
+        		ColumnSpec.decode("max(63dlu;default)"),
+        		ColumnSpec.decode("40dlu"),},
+        	new RowSpec[] {
+        		FormSpecs.DEFAULT_ROWSPEC,
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("25dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("25dlu"),
+        		RowSpec.decode("19dlu"),
+        		RowSpec.decode("20dlu"),}));
 
+        contentPane.setBackground(new Color(1.0F, 1.0F, 1.0F, 0.0F));
         userLabel.setText("Usuario:");
         userValueLabel.setText(client.getName());
         contentPane.add(userLabel, CC.xy(2, 2));
@@ -152,6 +188,16 @@ public class FormDialog extends JDialog {
         contentPane.add(bonificationValueLabel, CC.xy(7, 7));
 
         viewBonus.setText("Ver");
+        ImageIcon myImage = new ImageIcon(getClass().getResource("/images/VerBtn.jpg"));
+        viewBonus = new JButton(myImage);
+        viewBonus.setPreferredSize(new Dimension(50, 25));
+        viewBonus.setMinimumSize(new Dimension(50, 25));
+        viewBonus.setMaximumSize(new Dimension(50, 25));        
+        viewBonus.setAlignmentX(0.5F);
+        viewBonus.setOpaque(false);
+        viewBonus.setContentAreaFilled(false);
+        viewBonus.setBorderPainted(false);
+        viewBonus.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(viewBonus, CC.xy(8, 7));
         viewBonus.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +226,16 @@ public class FormDialog extends JDialog {
         contentPane.add(priceTextField, CC.xy(7, 11));
 
         rentButton.setText("Alquilar");
+        myImage = new ImageIcon(getClass().getResource("/images/AlquilarBtn.jpg"));
+        rentButton = new JButton(myImage);
+        rentButton.setPreferredSize(new Dimension(150, 100));
+        rentButton.setMinimumSize(new Dimension(150, 100));
+        rentButton.setMaximumSize(new Dimension(150, 100));        
+        rentButton.setAlignmentX(0.5F);
+        rentButton.setOpaque(false);
+        rentButton.setContentAreaFilled(false);
+        rentButton.setBorderPainted(false);
+        rentButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         rentButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RentRest rentRest = new RentRest();
@@ -191,9 +247,19 @@ public class FormDialog extends JDialog {
                 rentRest.rentComputer(client.getId(), computer.getId(), String.valueOf(rentHour));
             }
         });
-        contentPane.add(rentButton, CC.xy(4, 13));
+        contentPane.add(rentButton, "2, 13, 3, 1");
 
         rentAndExchangeButton.setText("Alquilar y Canjear");
+        myImage = new ImageIcon(getClass().getResource("/images/AlquilarYCanjearBtn.jpg"));
+        rentAndExchangeButton = new JButton(myImage);
+        rentAndExchangeButton.setPreferredSize(new Dimension(150, 100));
+        rentAndExchangeButton.setMinimumSize(new Dimension(150, 100));
+        rentAndExchangeButton.setMaximumSize(new Dimension(150, 100));
+        rentAndExchangeButton.setAlignmentX(0.5F);
+        rentAndExchangeButton.setOpaque(false);
+        rentAndExchangeButton.setContentAreaFilled(false);
+        rentAndExchangeButton.setBorderPainted(false);
+        rentAndExchangeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         rentAndExchangeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RentRest rentRest = new RentRest();
