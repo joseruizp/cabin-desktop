@@ -55,7 +55,8 @@ public class FormDialog extends JDialog {
     private JLabel rentTypeLabel;
     private JComboBox<Object> rentTypeCombobox;
     private JLabel timeLabel;
-    private JTextField timeTextField;
+    private JTextField hourTextField;
+    private JTextField minTextField;
     private JLabel priceLabel;
     private JTextField priceTextField;
     private JButton rentButton;
@@ -97,7 +98,8 @@ public class FormDialog extends JDialog {
         viewBonus = new JButton();
         rentTypeLabel = new JLabel();
         timeLabel = new JLabel();
-        timeTextField = new JTextField();
+        hourTextField = new JTextField();
+        minTextField = new JTextField();
         rentTypeCombobox = new JComboBox<Object>();
         priceLabel = new JLabel();
         priceTextField = new JTextField();
@@ -168,9 +170,10 @@ public class FormDialog extends JDialog {
         contentPane.add(rentTypeLabel, CC.xy(2, 9));
         contentPane.add(rentTypeCombobox, CC.xy(3, 9));
 
-        timeLabel.setText("Tiempo:");
+        timeLabel.setText("Tiempo (HH:MM):");
         contentPane.add(timeLabel, CC.xy(2, 11));
-        contentPane.add(timeTextField, CC.xy(3, 11));
+        contentPane.add(hourTextField, CC.xy(3, 11));
+        contentPane.add(minTextField, CC.xy(4, 11));
 
         priceLabel.setText("Precio:");
         contentPane.add(priceLabel, CC.xy(6, 11));
@@ -180,8 +183,12 @@ public class FormDialog extends JDialog {
         rentButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RentRest rentRest = new RentRest();
-                String rentTime = timeTextField.getText();
-                rentRest.rentComputer(client.getId(), computer.getId(), rentTime);
+                int rentHour = Integer.parseInt(hourTextField.getText());
+                int rentMin = Integer.parseInt(minTextField.getText());
+                if (rentMin > 0) {
+                	rentHour += (3/5)*(rentMin);
+                }
+                rentRest.rentComputer(client.getId(), computer.getId(), String.valueOf(rentHour));
             }
         });
         contentPane.add(rentButton, CC.xy(4, 13));
@@ -190,8 +197,12 @@ public class FormDialog extends JDialog {
         rentAndExchangeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 RentRest rentRest = new RentRest();
-                String rentTime = timeTextField.getText();
-                rentRest.rentComputer(client.getId(), computer.getId(), rentTime);
+                int rentHour = Integer.parseInt(hourTextField.getText());
+                int rentMin = Integer.parseInt(minTextField.getText());
+                if (rentMin > 0) {
+                	rentHour += (3/5)*(rentMin);
+                }
+                rentRest.rentComputer(client.getId(), computer.getId(), String.valueOf(rentHour));
             }
         });
         contentPane.add(rentAndExchangeButton, CC.xyw(6, 13, 2));
