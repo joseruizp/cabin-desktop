@@ -163,6 +163,8 @@ public class FormDialog extends JDialog {
         });
 
         rentTypeLabel.setText("Tipo Alquiler:");
+        rentTypeCombobox.addItem("Libre");
+        rentTypeCombobox.addItem("Control");
         contentPane.add(rentTypeLabel, CC.xy(2, 9));
         contentPane.add(rentTypeCombobox, CC.xy(3, 9));
 
