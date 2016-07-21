@@ -11,7 +11,7 @@ public class RentRest {
 
 	private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
 
-	public void rentComputer(Long clientId, Long computerId, String rentTime) {
+	public void rentComputer(Long clientId, Long computerId, String rentTime, String price) {
 		ClientConfig clientConfig = new DefaultClientConfig();
 
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -21,7 +21,8 @@ public class RentRest {
 		String uri = HOST_SERVICES + "/put/rentComputer";
 		uri += "?client_id=" + clientId;
 		uri += "&computer_id=" + computerId;
-		uri += "&rent_time=5" + rentTime;
+		uri += "&rent_time=" + rentTime;
+		uri += "&price=" + price;
 
 		WebResource webResource = client.resource(uri);
 		ClientResponse response = webResource.accept("application/json").type("application/json")

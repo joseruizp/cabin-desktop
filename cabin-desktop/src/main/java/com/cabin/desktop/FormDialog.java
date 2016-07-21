@@ -4,15 +4,25 @@
 
 package com.cabin.desktop;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -22,6 +32,9 @@ import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
 
 /**
  * @author jose ruiz
@@ -29,6 +42,10 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FormDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final NumberFormat PRICE_FORMAT = NumberFormat.getNumberInstance(Locale.US);
+
     private Client client;
     private Computer computer;
     private Double tariff;
@@ -55,13 +72,15 @@ public class FormDialog extends JDialog {
     private JLabel rentTypeLabel;
     private JComboBox<Object> rentTypeCombobox;
     private JLabel timeLabel;
-    private JTextField hourTextField;
-    private JTextField minTextField;
+    private JFormattedTextField timeTextField;
     private JLabel priceLabel;
-    private JTextField priceTextField;
+    private JFormattedTextField priceTextField;
     private JButton rentButton;
     private JButton rentAndExchangeButton;
 
+    /**
+     * @wbp.parser.constructor
+     */
     public FormDialog(Frame owner) {
         super(owner);
         initComponents();
@@ -98,17 +117,23 @@ public class FormDialog extends JDialog {
         viewBonus = new JButton();
         rentTypeLabel = new JLabel();
         timeLabel = new JLabel();
-        hourTextField = new JTextField();
-        minTextField = new JTextField();
+        timeTextField = new JFormattedTextField(TIME_FORMAT);
         rentTypeCombobox = new JComboBox<Object>();
         priceLabel = new JLabel();
-        priceTextField = new JTextField();
+        priceTextField = new JFormattedTextField(PRICE_FORMAT);
         rentButton = new JButton();
         rentAndExchangeButton = new JButton();
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout("30dlu, default, 50dlu, default, 15dlu, 50dlu, 69dlu:grow, default, 40dlu", "default, 13*(19dlu), 20dlu"));
+        contentPane.setLayout(new FormLayout(
+                new ColumnSpec[] { ColumnSpec.decode("30dlu"), FormSpecs.DEFAULT_COLSPEC, ColumnSpec.decode("50dlu"), ColumnSpec.decode("max(48dlu;default)"),
+                        ColumnSpec.decode("19dlu"), ColumnSpec.decode("55dlu"), ColumnSpec.decode("98dlu"), ColumnSpec.decode("max(63dlu;default)"),
+                        ColumnSpec.decode("40dlu"), },
+                new RowSpec[] { FormSpecs.DEFAULT_ROWSPEC, RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"),
+                        RowSpec.decode("19dlu"), RowSpec.decode("25dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"),
+                        RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("25dlu"), RowSpec.decode("19dlu"), RowSpec.decode("20dlu"), }));
 
+        contentPane.setBackground(new Color(1.0F, 1.0F, 1.0F, 0.0F));
         userLabel.setText("Usuario:");
         userValueLabel.setText(client.getName());
         contentPane.add(userLabel, CC.xy(2, 2));
@@ -152,6 +177,16 @@ public class FormDialog extends JDialog {
         contentPane.add(bonificationValueLabel, CC.xy(7, 7));
 
         viewBonus.setText("Ver");
+        ImageIcon myImage = new ImageIcon(getClass().getResource("/images/VerBtn.jpg"));
+        viewBonus = new JButton(myImage);
+        viewBonus.setPreferredSize(new Dimension(50, 25));
+        viewBonus.setMinimumSize(new Dimension(50, 25));
+        viewBonus.setMaximumSize(new Dimension(50, 25));
+        viewBonus.setAlignmentX(0.5F);
+        viewBonus.setOpaque(false);
+        viewBonus.setContentAreaFilled(false);
+        viewBonus.setBorderPainted(false);
+        viewBonus.setCursor(new Cursor(Cursor.HAND_CURSOR));
         contentPane.add(viewBonus, CC.xy(8, 7));
         viewBonus.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -171,38 +206,71 @@ public class FormDialog extends JDialog {
         contentPane.add(rentTypeCombobox, CC.xy(3, 9));
 
         timeLabel.setText("Tiempo (HH:MM):");
+        timeTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                timeTextField = (JFormattedTextField) evt.getSource();
+                if (timeTextField.getValue() != null) {
+                    double hour = getHours();
+                    double price = hour * tariff;
+                    priceTextField.setText(String.valueOf(price));
+                } else {
+                    System.out.println("time is null");
+                }
+            }
+        });
         contentPane.add(timeLabel, CC.xy(2, 11));
-        contentPane.add(hourTextField, CC.xy(3, 11));
-        contentPane.add(minTextField, CC.xy(4, 11));
+        contentPane.add(timeTextField, CC.xy(3, 11));
 
         priceLabel.setText("Precio:");
+        priceTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                priceTextField = (JFormattedTextField) evt.getSource();
+                System.out.println("priceTextField.getValue() :: " + priceTextField.getValue());
+                if ((Number) priceTextField.getValue() != null) {
+                    double price = ((Number) priceTextField.getValue()).doubleValue();
+                    double hours = round(price / tariff);
+                    timeTextField.setText(getHoursAsString(hours));
+                    System.out.println("price :: " + price);
+                } else {
+                    System.out.println("number is null");
+                }
+            }
+        });
         contentPane.add(priceLabel, CC.xy(6, 11));
         contentPane.add(priceTextField, CC.xy(7, 11));
 
         rentButton.setText("Alquilar");
+        myImage = new ImageIcon(getClass().getResource("/images/AlquilarBtn.jpg"));
+        rentButton = new JButton(myImage);
+        rentButton.setPreferredSize(new Dimension(150, 100));
+        rentButton.setMinimumSize(new Dimension(150, 100));
+        rentButton.setMaximumSize(new Dimension(150, 100));
+        rentButton.setAlignmentX(0.5F);
+        rentButton.setOpaque(false);
+        rentButton.setContentAreaFilled(false);
+        rentButton.setBorderPainted(false);
+        rentButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         rentButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                RentRest rentRest = new RentRest();
-                int rentHour = Integer.parseInt(hourTextField.getText());
-                int rentMin = Integer.parseInt(minTextField.getText());
-                if (rentMin > 0) {
-                	rentHour += (3/5)*(rentMin);
-                }
-                rentRest.rentComputer(client.getId(), computer.getId(), String.valueOf(rentHour));
+                rent();
             }
         });
-        contentPane.add(rentButton, CC.xy(4, 13));
+        contentPane.add(rentButton, "2, 13, 3, 1");
 
         rentAndExchangeButton.setText("Alquilar y Canjear");
+        myImage = new ImageIcon(getClass().getResource("/images/AlquilarYCanjearBtn.jpg"));
+        rentAndExchangeButton = new JButton(myImage);
+        rentAndExchangeButton.setPreferredSize(new Dimension(150, 100));
+        rentAndExchangeButton.setMinimumSize(new Dimension(150, 100));
+        rentAndExchangeButton.setMaximumSize(new Dimension(150, 100));
+        rentAndExchangeButton.setAlignmentX(0.5F);
+        rentAndExchangeButton.setOpaque(false);
+        rentAndExchangeButton.setContentAreaFilled(false);
+        rentAndExchangeButton.setBorderPainted(false);
+        rentAndExchangeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         rentAndExchangeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                RentRest rentRest = new RentRest();
-                int rentHour = Integer.parseInt(hourTextField.getText());
-                int rentMin = Integer.parseInt(minTextField.getText());
-                if (rentMin > 0) {
-                	rentHour += (3/5)*(rentMin);
-                }
-                rentRest.rentComputer(client.getId(), computer.getId(), String.valueOf(rentHour));
+                rent();
             }
         });
         contentPane.add(rentAndExchangeButton, CC.xyw(6, 13, 2));
@@ -211,6 +279,39 @@ public class FormDialog extends JDialog {
         setLocationRelativeTo(getOwner());
 
         setVisible(true);
+    }
+
+    private double getHours() {
+        String time = timeTextField.getText();
+        double totalHours = 0.0;
+        int hour = Integer.parseInt(time.split(":")[0]);
+        totalHours += hour;
+        int min = Integer.parseInt(time.split(":")[1]);
+        if (min > 0) {
+            totalHours += (min / 60.0);
+        }
+        return round(totalHours);
+    }
+
+    private double round(double value) {
+        long factor = (long) Math.pow(10, 2);
+        double factorValue = value * factor;
+        long tmp = Math.round(factorValue);
+        return (double) tmp / factor;
+    }
+
+    private static String getHoursAsString(double hours) {
+        long hour = (long) hours;
+        double fraction = hours - hour;
+        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
+        return hourString + ":" + (long) (60 * fraction);
+    }
+
+    private void rent() {
+        RentRest rentRest = new RentRest();
+        String rentTime = String.valueOf(getHours());
+        String price = priceTextField.getText();
+        rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price);
     }
 
 }
