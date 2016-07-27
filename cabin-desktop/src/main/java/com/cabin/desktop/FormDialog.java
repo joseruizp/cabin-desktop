@@ -35,6 +35,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import com.sun.jersey.core.impl.provider.header.NewCookieProvider;
 
 /**
  * @author jose ruiz
@@ -330,7 +331,8 @@ public class FormDialog extends JDialog {
         RentRest rentRest = new RentRest();
         String rentTime = String.valueOf(getHours());
         String price = priceTextField.getText();
-        rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price);
+        String points = newPointsTextField.getText();
+        rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price, points);
     }
 
 }
