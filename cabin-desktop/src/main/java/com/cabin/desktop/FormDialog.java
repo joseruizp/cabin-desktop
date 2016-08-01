@@ -31,11 +31,10 @@ import com.cabin.entity.Computer;
 import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
 import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-import com.sun.jersey.core.impl.provider.header.NewCookieProvider;
 
 /**
  * @author jose ruiz
@@ -166,7 +165,7 @@ public class FormDialog extends JDialog {
         contentPane.add(pointsValueLabel, CC.xy(3, 3));
 
         balanceLabel.setText("Saldo:");
-        balanceValueLabel.setText(String.valueOf(client.getBalance()));
+        balanceValueLabel.setText(PRICE_FORMAT.format(client.getBalance()));
         contentPane.add(balanceLabel, CC.xy(6, 3));
         contentPane.add(balanceValueLabel, CC.xy(7, 3));
 
@@ -190,6 +189,9 @@ public class FormDialog extends JDialog {
 
         newPointsLabel.setText("Puntos:");
         contentPane.add(newPointsLabel, CC.xy(2, 7));
+        if (client.getPoints() == 0) {
+            newPointsTextField.setEditable(false);
+        }
         contentPane.add(newPointsTextField, CC.xywh(3, 7, 2, 1));
 
         bonificationLabel.setText("Bonificacion:");
@@ -225,7 +227,7 @@ public class FormDialog extends JDialog {
         contentPane.add(rentTypeLabel, CC.xy(2, 9));
         contentPane.add(rentTypeCombobox, CC.xy(3, 9));
 
-        timeLabel.setText("Tiempo (HH:MM):");
+        timeLabel.setText("Tiempo (HH:MM): ");
         timeTextField.addPropertyChangeListener("value", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 timeTextField = (JFormattedTextField) evt.getSource();
@@ -333,6 +335,9 @@ public class FormDialog extends JDialog {
         String price = priceTextField.getText();
         String points = newPointsTextField.getText();
         rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price, points);
+        PWDialog.instance.dispose();
+        this.dispose();
+        PWLauncher.setTimer();
     }
 
 }

@@ -6,19 +6,26 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
+import javax.swing.Timer;
+
+import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang.time.StopWatch;
 
 public class PWLauncher extends JDialog implements ActionListener {
     private static final long serialVersionUID = -3759856811214634419L;
     public static PWDialog pwScreen = null;
     private static boolean locked = false;
     private static TrayIcon trayIcon;
+    private static StopWatch stopWatch = new StopWatch();
 
     public PWLauncher() {
         initSystemTray();
@@ -33,7 +40,6 @@ public class PWLauncher extends JDialog implements ActionListener {
 
         setFocusable(true);
         setVisible(true);
-        System.out.println("after constructor");
     }
 
     private void initSystemTray() {
@@ -42,7 +48,6 @@ public class PWLauncher extends JDialog implements ActionListener {
             return;
         }
 
-        PopupMenu popupMenu = new PopupMenu();
         SystemTray tray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(createImage("images/UnlockedIcon.png"));
         trayIcon.setToolTip("Screen locker - UNLOCKED");
@@ -51,11 +56,15 @@ public class PWLauncher extends JDialog implements ActionListener {
         MenuItem exitItem = new MenuItem("Exit");
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                stopWatch.stop();
                 System.exit(0);
             }
         });
+
+        PopupMenu popupMenu = new PopupMenu();
         popupMenu.add(exitItem);
         trayIcon.setPopupMenu(popupMenu);
+
         try {
             tray.add(trayIcon);
         } catch (AWTException e) {
@@ -89,10 +98,26 @@ public class PWLauncher extends JDialog implements ActionListener {
         toggleIcon();
         String[] s = null;
         try {
-            System.out.println("calling PWDialog main");
             PWDialog.main(s);
         } catch (AWTException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void setTimer() {
+        System.out.println("in setTimer");
+        final ActionListener timerAction = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                stopWatch.split();
+                String msg = DurationFormatUtils.formatDuration(stopWatch.getSplitTime(), "HH:mm:ss", true);
+                trayIcon.displayMessage("", msg, MessageType.NONE);
+            }
+        };
+
+        final Timer timer = new Timer(100, timerAction);
+        {
+            stopWatch.start();
+            timer.start();
         }
     }
 
