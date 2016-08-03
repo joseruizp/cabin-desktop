@@ -17,15 +17,14 @@ import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.Timer;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.commons.lang.time.StopWatch;
+import com.cabin.common.TimerUtil;
 
 public class PWLauncher extends JDialog implements ActionListener {
     private static final long serialVersionUID = -3759856811214634419L;
     public static PWDialog pwScreen = null;
     private static boolean locked = false;
     private static TrayIcon trayIcon;
-    private static StopWatch stopWatch = new StopWatch();
+    private static Timer timer;
 
     public PWLauncher() {
         initSystemTray();
@@ -56,7 +55,6 @@ public class PWLauncher extends JDialog implements ActionListener {
         MenuItem exitItem = new MenuItem("Exit");
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                stopWatch.stop();
                 System.exit(0);
             }
         });
@@ -104,25 +102,34 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
     }
 
-    public static void setTimer() {
-        System.out.println("in setTimer");
+    public static void showNotification(double totalTime, double price) {
+        System.out.println("in showNotification");
+        new NotificationDialog(getHoursAsString(totalTime), price);
+    }
+    
+    public static void showTimer(String totalTime) {
+        System.out.println("in showTimer");
+        final TimerUtil timerUtil = new TimerUtil(totalTime);
         final ActionListener timerAction = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                stopWatch.split();
-                String msg = DurationFormatUtils.formatDuration(stopWatch.getSplitTime(), "HH:mm:ss", true);
-                trayIcon.displayMessage("", msg, MessageType.NONE);
+                trayIcon.displayMessage("", timerUtil.getRemainingTime(), MessageType.NONE);
             }
         };
 
-        final Timer timer = new Timer(100, timerAction);
-        {
-            stopWatch.start();
-            timer.start();
-        }
+        timer = new Timer(1000, timerAction);
+        timer.start();
+    }
+
+    private static String getHoursAsString(double hours) {
+        long hour = (long) hours;
+        double fraction = hours - hour;
+        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
+        long minutes = Math.round(60 * fraction);
+        String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
+        return hourString + ":" + minutesString;
     }
 
     public static void main(String[] args) {
-        System.out.println("in PWLauncher");
         new PWLauncher();
     }
 }

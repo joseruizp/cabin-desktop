@@ -4,7 +4,6 @@ import java.awt.AWTException;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -31,6 +30,7 @@ import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
+import com.cabin.rest.RentRest;
 import com.cabin.rest.TariffRest;
 
 public class PWDialog extends JDialog implements ActionListener {
@@ -159,20 +159,40 @@ public class PWDialog extends JDialog implements ActionListener {
         imagePanel.setImage("/images/Unlocked.jpg", new Dimension(259, 180));
         showPanel("Card with Images");
 
-        final Dialog thisDialog = this;
+//        final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         final Long headquarterId = propertiesLoader.getLong("id_sede");
         final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
-//                PWDialog.instance.dispose();
-                new FormDialog(thisDialog, client, computer, tariff);
+                rent(client.getId(), computer.getId(), client.getBalance(), tariff);
+//                new FormDialog(thisDialog, client, computer, tariff);
                 security.stop();
             }
         }, 2000L);
     }
-
+    
+    private void rent(long clientId, long computerId, double balance, double tariff) {
+        RentRest rentRest = new RentRest();
+        double rentTime = getTimeToRent(balance, tariff);
+        System.out.println("rentTime ::: " + rentTime);
+        rentRest.rentComputer(clientId, computerId, String.valueOf(rentTime), String.valueOf(balance), null);
+        this.dispose();
+        PWLauncher.showNotification(rentTime, balance);
+    }
+    
+    private double getTimeToRent(double balance, double tariff) {
+        return round(balance / tariff);
+    }
+    
+    private double round(double value) {
+        long factor = (long) Math.pow(10, 2);
+        double factorValue = value * factor;
+        long tmp = Math.round(factorValue);
+        return (double) tmp / factor;
+    }
+    
     public void displayImage(String path, Dimension dims, Point point) {
         try {
             Image i = ImageIO.read(getClass().getResource(path));

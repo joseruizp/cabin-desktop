@@ -337,7 +337,6 @@ public class FormDialog extends JDialog {
         rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price, points);
         PWDialog.instance.dispose();
         this.dispose();
-        PWLauncher.setTimer();
     }
 
 }
