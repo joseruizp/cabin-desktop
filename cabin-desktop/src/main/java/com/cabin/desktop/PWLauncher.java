@@ -26,10 +26,13 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static TrayIcon trayIcon;
 
     private String totalTime;
+    private boolean isLoggedIn;
 
     public PWLauncher(String totalTime) {
         this();
         this.totalTime = totalTime;
+        this.isLoggedIn = true;
+        addViewDetailOption();
         toggleIcon();
     }
 
@@ -59,7 +62,15 @@ public class PWLauncher extends JDialog implements ActionListener {
         trayIcon.setToolTip("Screen locker - UNLOCKED");
         trayIcon.addActionListener(this);
 
-        MenuItem exitItem = new MenuItem("Exit");
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addViewDetailOption() {
+        MenuItem exitItem = new MenuItem("Ver Detalle");
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -69,12 +80,6 @@ public class PWLauncher extends JDialog implements ActionListener {
         PopupMenu popupMenu = new PopupMenu();
         popupMenu.add(exitItem);
         trayIcon.setPopupMenu(popupMenu);
-
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
     }
 
     public static Image createImage(String path) {
@@ -102,10 +107,14 @@ public class PWLauncher extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent arg0) {
         toggleIcon();
         String[] s = null;
-        try {
-            PWDialog.main(s);
-        } catch (AWTException e) {
-            e.printStackTrace();
+        if (isLoggedIn) {
+
+        } else {
+            try {
+                PWDialog.main(s);
+            } catch (AWTException e) {
+                e.printStackTrace();
+            }
         }
     }
 
