@@ -47,17 +47,18 @@ public class NotificationDialog extends JDialog {
         JLabel restTimeLabel = new JLabel("Tiempo Restante:");
         getContentPane().add(restTimeLabel);
 
-        JLabel restTimeValueLabel = new JLabel("");
+        JLabel restTimeValueLabel = new JLabel(totalTime);
         getContentPane().add(restTimeValueLabel);
         setTimer(restTimeValueLabel, totalTime);
 
+        final NotificationDialog thisDialog = this;
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
+                timer.stop();
                 PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime());
                 launcher.showTimer();
-                timer.stop();
-                System.exit(0);
+                thisDialog.dispose();
             }
         });
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

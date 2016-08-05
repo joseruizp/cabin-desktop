@@ -24,12 +24,13 @@ public class PWLauncher extends JDialog implements ActionListener {
     public static PWDialog pwScreen = null;
     private static boolean locked = false;
     private static TrayIcon trayIcon;
-    
+
     private String totalTime;
-    
+
     public PWLauncher(String totalTime) {
         this();
         this.totalTime = totalTime;
+        toggleIcon();
     }
 
     public PWLauncher() {
@@ -109,15 +110,24 @@ public class PWLauncher extends JDialog implements ActionListener {
     }
 
     public static void showNotification(double totalTime, double price) {
-        System.out.println("in showNotification");
+        SystemTray tray = SystemTray.getSystemTray();
+        tray.remove(trayIcon);
+        new NotificationDialog(getHoursAsString(totalTime), price);
     }
-    
+
+    private static String getHoursAsString(double hours) {
+        long hour = (long) hours;
+        double fraction = hours - hour;
+        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
+        long minutes = Math.round(60 * fraction);
+        String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
+        return hourString + ":" + minutesString + ":00";
+    }
+
     public void showTimer() {
-        System.out.println("in showTimer:: " + totalTime);
         final TimerUtil timerUtil = new TimerUtil(totalTime);
         final ActionListener timerAction = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("in timerAction::: " + timerUtil.getRemainingTime());
                 trayIcon.displayMessage("", timerUtil.getRemainingTime(), MessageType.NONE);
             }
         };

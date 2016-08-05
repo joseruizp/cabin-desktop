@@ -77,12 +77,12 @@ public class PWDialog extends JDialog implements ActionListener {
         pwField.setPlaceholder("Password");
         pwField.setAlignmentX(0.5F);
         pwField.setMaximumSize(new Dimension(319, 55));
-        
+
         txField = new PlaceholderTextField(10);
         txField.setPlaceholder("Email");
         txField.setAlignmentX(0.5F);
         txField.setMaximumSize(new Dimension(319, 55));
-        
+
         ImageIcon myImage = new ImageIcon(getClass().getResource("/images/login-button.jpg"));
         loginBtn = new JButton(myImage);
         loginBtn.setAlignmentX(0.5F);
@@ -141,7 +141,7 @@ public class PWDialog extends JDialog implements ActionListener {
         pack();
         setVisible(true);
         requestFocus();
-        
+
         security = new WindowsSecurity(this);
     }
 
@@ -159,7 +159,7 @@ public class PWDialog extends JDialog implements ActionListener {
         imagePanel.setImage("/images/Unlocked.jpg", new Dimension(259, 180));
         showPanel("Card with Images");
 
-//        final Dialog thisDialog = this;
+        // final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         final Long headquarterId = propertiesLoader.getLong("id_sede");
         final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
@@ -167,45 +167,31 @@ public class PWDialog extends JDialog implements ActionListener {
         t.schedule(new TimerTask() {
             public void run() {
                 rent(client.getId(), computer.getId(), client.getBalance(), tariff);
-//                new FormDialog(thisDialog, client, computer, tariff);
+                // new FormDialog(thisDialog, client, computer, tariff);
                 security.stop();
             }
-        }, 2000L);
+        }, 900L);
     }
-    
+
     private void rent(long clientId, long computerId, double balance, double tariff) {
         RentRest rentRest = new RentRest();
         double rentTime = getTimeToRent(balance, tariff);
-        System.out.println("rentTime ::: " + rentTime);
         rentRest.rentComputer(clientId, computerId, String.valueOf(rentTime), String.valueOf(balance), null);
         this.dispose();
-        showNotification(rentTime, balance);
+        PWLauncher.showNotification(rentTime, balance);
     }
-    
+
     private double getTimeToRent(double balance, double tariff) {
         return round(balance / tariff);
     }
-    
+
     private double round(double value) {
         long factor = (long) Math.pow(10, 2);
         double factorValue = value * factor;
         long tmp = Math.round(factorValue);
         return (double) tmp / factor;
     }
-    
-    private void showNotification(double rentTime, double price) {
-        new NotificationDialog(getHoursAsString(rentTime), price);
-    }
-    
-    private static String getHoursAsString(double hours) {
-        long hour = (long) hours;
-        double fraction = hours - hour;
-        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
-        long minutes = Math.round(60 * fraction);
-        String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
-        return hourString + ":" + minutesString;
-    }
-    
+
     public void displayImage(String path, Dimension dims, Point point) {
         try {
             Image i = ImageIO.read(getClass().getResource(path));
@@ -239,10 +225,10 @@ public class PWDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String email = txField.getText();
         String password = pwField.getText();
-        
+
         LoginRest loginRest = new LoginRest();
         Client client = loginRest.login(email, password);
-        
+
         if (client != null) {
             System.out.println("loggin successfull");
             accept(client);

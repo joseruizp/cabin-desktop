@@ -9,7 +9,7 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 
 public class TimerUtil {
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
     {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
@@ -19,6 +19,10 @@ public class TimerUtil {
     public TimerUtil(String totalTime) {
         super();
         try {
+            String[] split = totalTime.split(":");
+            if (split.length == 2) {
+                totalTime = totalTime.concat(":00");
+            }
             Date startDate = TIME_FORMAT.parse(totalTime);
             this.totalSeconds = startDate.getTime() / 1000L;
         } catch (ParseException e) {
@@ -27,8 +31,8 @@ public class TimerUtil {
     }
 
     public String getRemainingTime() {
-        totalSeconds--;
         Long miliseconds = (totalSeconds * 1000) - 1000;
+        totalSeconds--;
         return DurationFormatUtils.formatDuration(miliseconds, "HH:mm:ss", true);
     }
 
