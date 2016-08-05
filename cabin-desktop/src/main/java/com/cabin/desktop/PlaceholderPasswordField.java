@@ -40,6 +40,7 @@ public class PlaceholderPasswordField extends JPasswordField {
         return placeholder;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void paintComponent(final Graphics pG) {
         super.paintComponent(pG);
