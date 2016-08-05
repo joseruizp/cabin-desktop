@@ -53,7 +53,9 @@ public class NotificationDialog extends JDialog {
 
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
-                PWLauncher.showTimer(timerUtil.getRemainingTime());
+                System.out.println("closing notification");
+                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime());
+                launcher.showTimer();
                 timer.stop();
                 System.exit(0);
             }

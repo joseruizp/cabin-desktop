@@ -179,7 +179,7 @@ public class PWDialog extends JDialog implements ActionListener {
         System.out.println("rentTime ::: " + rentTime);
         rentRest.rentComputer(clientId, computerId, String.valueOf(rentTime), String.valueOf(balance), null);
         this.dispose();
-        PWLauncher.showNotification(rentTime, balance);
+        showNotification(rentTime, balance);
     }
     
     private double getTimeToRent(double balance, double tariff) {
@@ -191,6 +191,19 @@ public class PWDialog extends JDialog implements ActionListener {
         double factorValue = value * factor;
         long tmp = Math.round(factorValue);
         return (double) tmp / factor;
+    }
+    
+    private void showNotification(double rentTime, double price) {
+        new NotificationDialog(getHoursAsString(rentTime), price);
+    }
+    
+    private static String getHoursAsString(double hours) {
+        long hour = (long) hours;
+        double fraction = hours - hour;
+        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
+        long minutes = Math.round(60 * fraction);
+        String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
+        return hourString + ":" + minutesString;
     }
     
     public void displayImage(String path, Dimension dims, Point point) {
