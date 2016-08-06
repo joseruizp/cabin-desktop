@@ -42,7 +42,7 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.setLayout(null);
         {
             userLabel = new JLabel("Usuario:");
-            userLabel.setBounds(33, 31, 40, 14);
+            userLabel.setBounds(33, 31, 55, 14);
             contentPanel.add(userLabel);
         }
 
@@ -51,7 +51,7 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(userValueLabel);
         {
             pointsLabel = new JLabel("Puntos:");
-            pointsLabel.setBounds(163, 31, 37, 14);
+            pointsLabel.setBounds(163, 31, 47, 14);
             contentPanel.add(pointsLabel);
         }
 
@@ -60,7 +60,7 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(pointsValueLabel);
         {
             balanceLabel = new JLabel("Saldo:");
-            balanceLabel.setBounds(257, 31, 30, 14);
+            balanceLabel.setBounds(257, 31, 40, 14);
             contentPanel.add(balanceLabel);
         }
 
@@ -69,24 +69,24 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(balanceValueLabel);
         {
             experienceLabel = new JLabel("Experiencia:");
-            experienceLabel.setBounds(344, 31, 59, 14);
+            experienceLabel.setBounds(344, 31, 70, 14);
             contentPanel.add(experienceLabel);
         }
 
         JLabel experienceValueLabel = new JLabel(String.valueOf(form.getClient().getExperience()));
-        experienceValueLabel.setBounds(404, 31, 37, 14);
+        experienceValueLabel.setBounds(418, 31, 37, 14);
         contentPanel.add(experienceValueLabel);
 
         JLabel groupLabel = new JLabel("Grupo PC:");
-        groupLabel.setBounds(33, 82, 52, 14);
+        groupLabel.setBounds(33, 82, 62, 14);
         contentPanel.add(groupLabel);
 
         JLabel groupValueLabel = new JLabel(form.getComputer().getGroup().getName());
-        groupValueLabel.setBounds(83, 82, 117, 14);
+        groupValueLabel.setBounds(93, 82, 117, 14);
         contentPanel.add(groupValueLabel);
 
         JLabel tariffLabel = new JLabel("Tarifa:");
-        tariffLabel.setBounds(257, 82, 32, 14);
+        tariffLabel.setBounds(257, 82, 42, 14);
         contentPanel.add(tariffLabel);
 
         JLabel tariffValueLabel = new JLabel(PRICE_FORMAT.format(form.getTariff()));
@@ -94,24 +94,24 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(tariffValueLabel);
 
         JLabel lblPorHora = new JLabel("por Hora");
-        lblPorHora.setBounds(335, 82, 42, 14);
+        lblPorHora.setBounds(335, 82, 52, 14);
         contentPanel.add(lblPorHora);
 
         JLabel lblPuntosACanjear = new JLabel("Puntos a Canjear:");
-        lblPuntosACanjear.setBounds(33, 130, 87, 14);
+        lblPuntosACanjear.setBounds(33, 130, 107, 14);
         contentPanel.add(lblPuntosACanjear);
 
         newPointsTextField = new JTextField();
-        newPointsTextField.setBounds(125, 127, 59, 20);
+        newPointsTextField.setBounds(139, 127, 59, 20);
         contentPanel.add(newPointsTextField);
         newPointsTextField.setColumns(10);
 
         JLabel bonusLabel = new JLabel("Bonificacion:");
-        bonusLabel.setBounds(257, 130, 61, 14);
+        bonusLabel.setBounds(257, 130, 81, 14);
         contentPanel.add(bonusLabel);
 
         final JLabel bonusValueLabel = new JLabel("");
-        bonusValueLabel.setBounds(328, 130, 49, 14);
+        bonusValueLabel.setBounds(338, 130, 49, 14);
         contentPanel.add(bonusValueLabel);
 
         JPanel buttonPane = new JPanel();
