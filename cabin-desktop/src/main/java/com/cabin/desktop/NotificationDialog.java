@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 
 import com.cabin.common.TimerUtil;
+import com.cabin.entity.FormInformation;
 
 public class NotificationDialog extends JDialog {
 
@@ -26,7 +27,7 @@ public class NotificationDialog extends JDialog {
     private TimerUtil timerUtil;
     private Timer timer;
 
-    public NotificationDialog(String totalTime, Double price) {
+    public NotificationDialog(String totalTime, final FormInformation form) {
         setTitle("Notifiaciones");
         setResizable(false);
         setBounds(100, 100, 728, 94);
@@ -41,6 +42,7 @@ public class NotificationDialog extends JDialog {
         JLabel availableBalanceLabel = new JLabel("Saldo Disponible:");
         getContentPane().add(availableBalanceLabel);
 
+        Double price = form.getClient().getBalance();
         JLabel availableBalanceValueLabel = new JLabel(String.valueOf(round(price)));
         getContentPane().add(availableBalanceValueLabel);
 
@@ -56,7 +58,7 @@ public class NotificationDialog extends JDialog {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
                 timer.stop();
-                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime());
+                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime(), form);
                 launcher.showTimer();
                 thisDialog.dispose();
             }

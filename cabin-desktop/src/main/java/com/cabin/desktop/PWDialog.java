@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import com.cabin.common.PropertiesLoader;
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
+import com.cabin.entity.FormInformation;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
 import com.cabin.rest.RentRest;
@@ -166,19 +167,19 @@ public class PWDialog extends JDialog implements ActionListener {
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
-                rent(client.getId(), computer.getId(), client.getBalance(), tariff);
-                // new FormDialog(thisDialog, client, computer, tariff);
+                double rentTime = rent(client.getId(), computer.getId(), client.getBalance(), tariff);
+                PWLauncher.showNotification(new FormInformation(client, computer, tariff), rentTime);
                 security.stop();
             }
         }, 900L);
     }
 
-    private void rent(long clientId, long computerId, double balance, double tariff) {
+    private double rent(long clientId, long computerId, double balance, double tariff) {
         RentRest rentRest = new RentRest();
         double rentTime = getTimeToRent(balance, tariff);
         rentRest.rentComputer(clientId, computerId, String.valueOf(rentTime), String.valueOf(balance), null);
         this.dispose();
-        PWLauncher.showNotification(rentTime, balance);
+        return rentTime;
     }
 
     private double getTimeToRent(double balance, double tariff) {

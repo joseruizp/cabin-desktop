@@ -18,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.Timer;
 
 import com.cabin.common.TimerUtil;
+import com.cabin.entity.FormInformation;
 
 public class PWLauncher extends JDialog implements ActionListener {
     private static final long serialVersionUID = -3759856811214634419L;
@@ -27,11 +28,13 @@ public class PWLauncher extends JDialog implements ActionListener {
 
     private String totalTime;
     private boolean isLoggedIn;
+    private FormInformation form;
 
-    public PWLauncher(String totalTime) {
+    public PWLauncher(String totalTime, FormInformation form) {
         this();
         this.totalTime = totalTime;
         this.isLoggedIn = true;
+        this.form = form;
         addViewDetailOption();
         toggleIcon();
     }
@@ -73,7 +76,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         MenuItem exitItem = new MenuItem("Ver Detalle");
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                new ViewDetailDialog(form);
             }
         });
 
@@ -107,9 +110,7 @@ public class PWLauncher extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent arg0) {
         toggleIcon();
         String[] s = null;
-        if (isLoggedIn) {
-
-        } else {
+        if (!isLoggedIn) {
             try {
                 PWDialog.main(s);
             } catch (AWTException e) {
@@ -118,10 +119,10 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
     }
 
-    public static void showNotification(double totalTime, double price) {
+    public static void showNotification(FormInformation form, double totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
-        new NotificationDialog(getHoursAsString(totalTime), price);
+        new NotificationDialog(getHoursAsString(totalTime), form);
     }
 
     private static String getHoursAsString(double hours) {

@@ -2,42 +2,38 @@ package com.cabin.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import com.cabin.entity.FormInformation;
+import com.cabin.rest.PrizesRuleRest;
 
 public class ViewDetailDialog extends JDialog {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final NumberFormat PRICE_FORMAT = NumberFormat.getNumberInstance(Locale.US);
 
     private final JPanel contentPanel = new JPanel();
     private JLabel userLabel;
     private JLabel pointsLabel;
     private JLabel balanceLabel;
     private JLabel experienceLabel;
-    private JTextField textField;
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        try {
-            ViewDetailDialog dialog = new ViewDetailDialog();
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private JTextField newPointsTextField;
 
     /**
      * Create the dialog.
      */
-    public ViewDetailDialog() {
+    public ViewDetailDialog(final FormInformation form) {
         setBounds(100, 100, 489, 245);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
@@ -49,8 +45,8 @@ public class ViewDetailDialog extends JDialog {
             userLabel.setBounds(33, 31, 40, 14);
             contentPanel.add(userLabel);
         }
-        
-        JLabel userValueLabel = new JLabel("");
+
+        JLabel userValueLabel = new JLabel(form.getClient().getName());
         userValueLabel.setBounds(83, 31, 70, 14);
         contentPanel.add(userValueLabel);
         {
@@ -58,8 +54,8 @@ public class ViewDetailDialog extends JDialog {
             pointsLabel.setBounds(163, 31, 37, 14);
             contentPanel.add(pointsLabel);
         }
-        
-        JLabel pointsValueLabel = new JLabel("");
+
+        JLabel pointsValueLabel = new JLabel(String.valueOf(form.getClient().getPoints()));
         pointsValueLabel.setBounds(210, 31, 37, 14);
         contentPanel.add(pointsValueLabel);
         {
@@ -67,8 +63,8 @@ public class ViewDetailDialog extends JDialog {
             balanceLabel.setBounds(257, 31, 30, 14);
             contentPanel.add(balanceLabel);
         }
-        
-        JLabel balanceValueLabel = new JLabel("");
+
+        JLabel balanceValueLabel = new JLabel(PRICE_FORMAT.format(form.getClient().getBalance()));
         balanceValueLabel.setBounds(297, 31, 37, 14);
         contentPanel.add(balanceValueLabel);
         {
@@ -76,66 +72,84 @@ public class ViewDetailDialog extends JDialog {
             experienceLabel.setBounds(344, 31, 59, 14);
             contentPanel.add(experienceLabel);
         }
-        
-        JLabel experienceValueLabel = new JLabel("");
+
+        JLabel experienceValueLabel = new JLabel(String.valueOf(form.getClient().getExperience()));
         experienceValueLabel.setBounds(404, 31, 37, 14);
         contentPanel.add(experienceValueLabel);
-        
+
         JLabel groupLabel = new JLabel("Grupo PC:");
         groupLabel.setBounds(33, 82, 52, 14);
         contentPanel.add(groupLabel);
-        
-        JLabel groupValueLabel = new JLabel("");
+
+        JLabel groupValueLabel = new JLabel(form.getComputer().getGroup().getName());
         groupValueLabel.setBounds(83, 82, 117, 14);
         contentPanel.add(groupValueLabel);
-        
+
         JLabel tariffLabel = new JLabel("Tarifa:");
         tariffLabel.setBounds(257, 82, 32, 14);
         contentPanel.add(tariffLabel);
-        
-        JLabel tariffValueLabel = new JLabel("");
+
+        JLabel tariffValueLabel = new JLabel(PRICE_FORMAT.format(form.getTariff()));
         tariffValueLabel.setBounds(297, 82, 32, 14);
         contentPanel.add(tariffValueLabel);
-        
+
         JLabel lblPorHora = new JLabel("por Hora");
         lblPorHora.setBounds(335, 82, 42, 14);
         contentPanel.add(lblPorHora);
-        
+
         JLabel lblPuntosACanjear = new JLabel("Puntos a Canjear:");
         lblPuntosACanjear.setBounds(33, 130, 87, 14);
         contentPanel.add(lblPuntosACanjear);
-        
-        textField = new JTextField();
-        textField.setBounds(125, 127, 59, 20);
-        contentPanel.add(textField);
-        textField.setColumns(10);
-        
+
+        newPointsTextField = new JTextField();
+        newPointsTextField.setBounds(125, 127, 59, 20);
+        contentPanel.add(newPointsTextField);
+        newPointsTextField.setColumns(10);
+
         JLabel bonusLabel = new JLabel("Bonificacion:");
         bonusLabel.setBounds(257, 130, 61, 14);
         contentPanel.add(bonusLabel);
-        
-        JLabel bonusValueLabel = new JLabel("");
+
+        final JLabel bonusValueLabel = new JLabel("");
         bonusValueLabel.setBounds(328, 130, 49, 14);
         contentPanel.add(bonusValueLabel);
-        {
-            JPanel buttonPane = new JPanel();
-            buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-            getContentPane().add(buttonPane, BorderLayout.SOUTH);
-            
-            JButton viewBtn = new JButton("Ver Bono");
-            viewBtn.setActionCommand("OK");
-            buttonPane.add(viewBtn);
-            {
-                JButton exchangeBtn = new JButton("Canjear");
-                exchangeBtn.setActionCommand("OK");
-                buttonPane.add(exchangeBtn);
-                getRootPane().setDefaultButton(exchangeBtn);
+
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
+        JButton viewBtn = new JButton("Ver Bono");
+        buttonPane.add(viewBtn);
+        viewBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("entra viewBonus");
+                int points = Integer.parseInt(newPointsTextField.getText());
+                System.out.println("entra viewBonus, points: " + points);
+                String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+                System.out.println("entra viewBonus, balance: " + balance);
+                bonusValueLabel.setText(balance);
             }
-            {
-                JButton stopBtn = new JButton("Detener");
-                stopBtn.setActionCommand("Cancel");
-                buttonPane.add(stopBtn);
+        });
+
+        JButton exchangeBtn = new JButton("Canjear");
+        buttonPane.add(exchangeBtn);
+        getRootPane().setDefaultButton(exchangeBtn);
+        exchangeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
             }
-        }
+        });
+
+        JButton stopBtn = new JButton("Detener");
+        buttonPane.add(stopBtn);
+        stopBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setVisible(true);
     }
+
 }
