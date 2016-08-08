@@ -10,7 +10,6 @@ import java.util.TimeZone;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.Timer;
 
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
@@ -25,7 +24,6 @@ public class NotificationDialog extends JDialog {
     }
 
     private TimerUtil timerUtil;
-    private Timer timer;
 
     public NotificationDialog(String totalTime, final FormInformation form) {
         setTitle("Notifiaciones");
@@ -57,8 +55,8 @@ public class NotificationDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
-                timer.stop();
-                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime(), form);
+                timerUtil.stop();
+                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime(), timerUtil.getSecondsUsed(), form);
                 launcher.showTimer();
                 thisDialog.dispose();
             }
@@ -75,13 +73,11 @@ public class NotificationDialog extends JDialog {
     }
 
     private void setTimer(final JLabel timerLabel, String totalTime) {
-        this.timerUtil = new TimerUtil(totalTime);
-        timer = new Timer(1000, new ActionListener() {
+        this.timerUtil = new TimerUtil(totalTime, null, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 timerLabel.setText(timerUtil.getRemainingTime());
             }
         });
-        timer.start();
     }
 
 }

@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
-import javax.swing.Timer;
 
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
@@ -27,16 +26,19 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static TrayIcon trayIcon;
 
     private String totalTime;
+    private Long secondsUsed;
     private boolean isLoggedIn;
     private FormInformation form;
+    private TimerUtil timerUtil;
 
-    public PWLauncher(String totalTime, FormInformation form) {
+    public PWLauncher(String totalTime, Long secondsUsed, FormInformation form) {
         this();
         this.totalTime = totalTime;
+        this.secondsUsed = secondsUsed;
         this.isLoggedIn = true;
         this.form = form;
         addViewDetailOption();
-        toggleIcon();
+        setUnlockedIcon();
     }
 
     public PWLauncher() {
@@ -62,7 +64,7 @@ public class PWLauncher extends JDialog implements ActionListener {
 
         SystemTray tray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(createImage("images/UnlockedIcon.png"));
-        trayIcon.setToolTip("Screen locker - UNLOCKED");
+        trayIcon.setToolTip("Sistema de Cabinas");
         trayIcon.addActionListener(this);
 
         try {
@@ -76,7 +78,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         MenuItem exitItem = new MenuItem("Ver Detalle");
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ViewDetailDialog(form);
+                new ViewDetailDialog(form, timerUtil);
             }
         });
 
@@ -99,23 +101,27 @@ public class PWLauncher extends JDialog implements ActionListener {
         final String path;
         if (locked) {
             path = "images/LockedIcon.png";
-            trayIcon.setToolTip("Screen locker - LOCKED");
         } else {
             path = "images/UnlockedIcon.png";
-            trayIcon.setToolTip("Screen locker - UNLOCKED");
         }
         trayIcon.setImage(createImage(path));
     }
 
+    public static void setUnlockedIcon() {
+        trayIcon.setImage(createImage("images/UnlockedIcon.png"));
+    }
+
     public void actionPerformed(ActionEvent arg0) {
-        toggleIcon();
-        String[] s = null;
         if (!isLoggedIn) {
+            toggleIcon();
+            String[] s = null;
             try {
                 PWDialog.main(s);
             } catch (AWTException e) {
                 e.printStackTrace();
             }
+        } else {
+            new ViewDetailDialog(form, timerUtil);
         }
     }
 
@@ -135,15 +141,11 @@ public class PWLauncher extends JDialog implements ActionListener {
     }
 
     public void showTimer() {
-        final TimerUtil timerUtil = new TimerUtil(totalTime);
-        final ActionListener timerAction = new ActionListener() {
+        this.timerUtil = new TimerUtil(totalTime, secondsUsed, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 trayIcon.displayMessage("", timerUtil.getRemainingTime(), MessageType.NONE);
             }
-        };
-
-        Timer timer = new Timer(1000, timerAction);
-        timer.start();
+        });
     }
 
     public static void main(String[] args) {

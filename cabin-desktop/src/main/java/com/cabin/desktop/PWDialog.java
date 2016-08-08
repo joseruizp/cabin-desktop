@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -160,25 +161,24 @@ public class PWDialog extends JDialog implements ActionListener {
         imagePanel.setImage("/images/Unlocked.jpg", new Dimension(259, 180));
         showPanel("Card with Images");
 
-        // final Dialog thisDialog = this;
+        final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         final Long headquarterId = propertiesLoader.getLong("id_sede");
         final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
-                double rentTime = rent(client.getId(), computer.getId(), client.getBalance(), tariff);
-                PWLauncher.showNotification(new FormInformation(client, computer, tariff), rentTime);
+                double rentTime = getRentTime(client.getBalance(), tariff);
+                Long rentId = new RentRest().startRentComputer(client.getId(), computer.getId());
+                thisDialog.dispose();
+                PWLauncher.showNotification(new FormInformation(rentId, client, computer, tariff), rentTime);
                 security.stop();
             }
         }, 900L);
     }
 
-    private double rent(long clientId, long computerId, double balance, double tariff) {
-        RentRest rentRest = new RentRest();
+    private double getRentTime(double balance, double tariff) {
         double rentTime = getTimeToRent(balance, tariff);
-        rentRest.rentComputer(clientId, computerId, String.valueOf(rentTime), String.valueOf(balance), null);
-        this.dispose();
         return rentTime;
     }
 

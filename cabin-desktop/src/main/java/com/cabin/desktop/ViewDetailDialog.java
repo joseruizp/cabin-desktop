@@ -14,8 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
 import com.cabin.rest.PrizesRuleRest;
+import com.cabin.rest.RentRest;
 
 public class ViewDetailDialog extends JDialog {
 
@@ -33,7 +35,7 @@ public class ViewDetailDialog extends JDialog {
     /**
      * Create the dialog.
      */
-    public ViewDetailDialog(final FormInformation form) {
+    public ViewDetailDialog(final FormInformation form, final TimerUtil timerUtil) {
         setBounds(100, 100, 489, 245);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
@@ -106,12 +108,12 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(newPointsTextField);
         newPointsTextField.setColumns(10);
 
-        JLabel bonusLabel = new JLabel("Bonificacion:");
-        bonusLabel.setBounds(257, 130, 81, 14);
+        JLabel bonusLabel = new JLabel("Saldo a Obtener:");
+        bonusLabel.setBounds(257, 130, 101, 14);
         contentPanel.add(bonusLabel);
 
         final JLabel bonusValueLabel = new JLabel("");
-        bonusValueLabel.setBounds(338, 130, 49, 14);
+        bonusValueLabel.setBounds(354, 130, 49, 14);
         contentPanel.add(bonusValueLabel);
 
         JPanel buttonPane = new JPanel();
@@ -136,7 +138,7 @@ public class ViewDetailDialog extends JDialog {
         getRootPane().setDefaultButton(exchangeBtn);
         exchangeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
             }
         });
 
@@ -144,12 +146,23 @@ public class ViewDetailDialog extends JDialog {
         buttonPane.add(stopBtn);
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Long secondsUsed = timerUtil.getSecondsUsed();
+                Long minutesUsed = new Long(secondsUsed / 60);
+                double hoursUsed = minutesUsed / 60.0;
+                double totalHours = round(hoursUsed);
+                double price = totalHours * form.getTariff();
+                new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+            }
 
+            private double round(double value) {
+                long factor = (long) Math.pow(10, 2);
+                double factorValue = value * factor;
+                long tmp = Math.round(factorValue);
+                return (double) tmp / factor;
             }
         });
 
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
-
 }

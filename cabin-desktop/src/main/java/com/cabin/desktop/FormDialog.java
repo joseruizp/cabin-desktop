@@ -334,7 +334,7 @@ public class FormDialog extends JDialog {
         String rentTime = String.valueOf(getHours());
         String price = priceTextField.getText();
         String points = newPointsTextField.getText();
-        rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price, points);
+//        rentRest.rentComputer(client.getId(), computer.getId(), rentTime, price, points);
         PWDialog.instance.dispose();
         this.dispose();
     }
