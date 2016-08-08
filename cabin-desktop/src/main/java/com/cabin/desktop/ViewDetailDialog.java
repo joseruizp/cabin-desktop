@@ -35,7 +35,8 @@ public class ViewDetailDialog extends JDialog {
     /**
      * Create the dialog.
      */
-    public ViewDetailDialog(final FormInformation form, final TimerUtil timerUtil) {
+    public ViewDetailDialog(final FormInformation form, final TimerUtil timerUtil, final PWLauncher launcher) {
+        final ViewDetailDialog thisDialog = this;
         setBounds(100, 100, 489, 245);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
@@ -139,6 +140,7 @@ public class ViewDetailDialog extends JDialog {
         exchangeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
+                thisDialog.dispose();
             }
         });
 
@@ -147,11 +149,17 @@ public class ViewDetailDialog extends JDialog {
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Long secondsUsed = timerUtil.getSecondsUsed();
+                System.out.println("secondsUsed : " + secondsUsed);
                 Long minutesUsed = new Long(secondsUsed / 60);
+                System.out.println("minutesUsed : " + minutesUsed);
                 double hoursUsed = minutesUsed / 60.0;
+                System.out.println("hoursUsed : " + hoursUsed);
                 double totalHours = round(hoursUsed);
                 double price = totalHours * form.getTariff();
                 new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+
+                thisDialog.dispose();
+                launcher.blockComputer();
             }
 
             private double round(double value) {

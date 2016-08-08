@@ -76,9 +76,10 @@ public class PWLauncher extends JDialog implements ActionListener {
 
     private void addViewDetailOption() {
         MenuItem exitItem = new MenuItem("Ver Detalle");
+        final PWLauncher thisDialog = this;
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ViewDetailDialog(form, timerUtil);
+                new ViewDetailDialog(form, timerUtil, thisDialog);
             }
         });
 
@@ -113,15 +114,19 @@ public class PWLauncher extends JDialog implements ActionListener {
 
     public void actionPerformed(ActionEvent arg0) {
         if (!isLoggedIn) {
-            toggleIcon();
-            String[] s = null;
-            try {
-                PWDialog.main(s);
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
+            blockComputer();
         } else {
-            new ViewDetailDialog(form, timerUtil);
+            new ViewDetailDialog(form, timerUtil, this);
+        }
+    }
+
+    public void blockComputer() {
+        toggleIcon();
+        String[] s = null;
+        try {
+            PWDialog.main(s);
+        } catch (AWTException e) {
+            e.printStackTrace();
         }
     }
 
@@ -131,7 +136,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         new NotificationDialog(getHoursAsString(totalTime), form);
     }
 
-    private static String getHoursAsString(double hours) {
+    public static String getHoursAsString(double hours) {
         long hour = (long) hours;
         double fraction = hours - hour;
         String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
@@ -143,6 +148,10 @@ public class PWLauncher extends JDialog implements ActionListener {
     public void showTimer() {
         this.timerUtil = new TimerUtil(totalTime, secondsUsed, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (timerUtil.isOver()) {
+                    timerUtil.stop();
+                    blockComputer();
+                }
                 trayIcon.displayMessage("", timerUtil.getRemainingTime(), MessageType.NONE);
             }
         });

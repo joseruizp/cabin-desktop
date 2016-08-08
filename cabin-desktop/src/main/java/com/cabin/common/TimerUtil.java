@@ -63,5 +63,9 @@ public class TimerUtil {
     public void stop() {
         timer.stop();
     }
+    
+    public boolean isOver() {
+        return (totalSeconds == 1 || totalSeconds == 0);
+    }
 
 }
