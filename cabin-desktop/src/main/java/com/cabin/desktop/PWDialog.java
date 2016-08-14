@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.cabin.common.PropertiesLoader;
+import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
 import com.cabin.entity.FormInformation;
@@ -168,29 +169,13 @@ public class PWDialog extends JDialog implements ActionListener {
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
-                double rentTime = getRentTime(client.getBalance(), tariff);
+                double rentTime = TimerUtil.getTimeAsHours(client.getBalance(), tariff);
                 Long rentId = new RentRest().startRentComputer(client.getId(), computer.getId());
                 thisDialog.dispose();
                 PWLauncher.showNotification(new FormInformation(rentId, client, computer, tariff), rentTime);
                 security.stop();
             }
         }, 900L);
-    }
-
-    private double getRentTime(double balance, double tariff) {
-        double rentTime = getTimeToRent(balance, tariff);
-        return rentTime;
-    }
-
-    private double getTimeToRent(double balance, double tariff) {
-        return round(balance / tariff);
-    }
-
-    private double round(double value) {
-        long factor = (long) Math.pow(10, 2);
-        double factorValue = value * factor;
-        long tmp = Math.round(factorValue);
-        return (double) tmp / factor;
     }
 
     public void displayImage(String path, Dimension dims, Point point) {

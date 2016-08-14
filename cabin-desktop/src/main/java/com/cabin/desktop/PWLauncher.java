@@ -31,6 +31,8 @@ public class PWLauncher extends JDialog implements ActionListener {
     private FormInformation form;
     private TimerUtil timerUtil;
 
+    private ViewDetailDialog viewDetailDialog;
+
     public PWLauncher(String totalTime, Long secondsUsed, FormInformation form) {
         this();
         this.totalTime = totalTime;
@@ -39,6 +41,10 @@ public class PWLauncher extends JDialog implements ActionListener {
         this.form = form;
         addViewDetailOption();
         setUnlockedIcon();
+    }
+
+    public void setTimerUtil() {
+
     }
 
     public PWLauncher() {
@@ -79,7 +85,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         final PWLauncher thisDialog = this;
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ViewDetailDialog(form, timerUtil, thisDialog);
+                showViewDetail(thisDialog);
             }
         });
 
@@ -116,7 +122,15 @@ public class PWLauncher extends JDialog implements ActionListener {
         if (!isLoggedIn) {
             blockComputer();
         } else {
-            new ViewDetailDialog(form, timerUtil, this);
+            showViewDetail(this);
+        }
+    }
+
+    private void showViewDetail(PWLauncher launcher) {
+        if (viewDetailDialog == null) {
+            viewDetailDialog = new ViewDetailDialog(form, timerUtil, launcher);
+        } else {
+            viewDetailDialog.setVisible(true);
         }
     }
 
@@ -133,16 +147,7 @@ public class PWLauncher extends JDialog implements ActionListener {
     public static void showNotification(FormInformation form, double totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
-        new NotificationDialog(getHoursAsString(totalTime), form);
-    }
-
-    public static String getHoursAsString(double hours) {
-        long hour = (long) hours;
-        double fraction = hours - hour;
-        String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
-        long minutes = Math.round(60 * fraction);
-        String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
-        return hourString + ":" + minutesString + ":00";
+        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form);
     }
 
     public void showTimer() {
@@ -157,7 +162,12 @@ public class PWLauncher extends JDialog implements ActionListener {
         });
     }
 
+    public void extendTime(double hours) {
+        this.timerUtil.extendTime(hours);
+    }
+
     public static void main(String[] args) {
         new PWLauncher();
     }
+
 }

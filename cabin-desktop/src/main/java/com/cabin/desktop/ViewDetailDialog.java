@@ -15,9 +15,11 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import com.cabin.common.TimerUtil;
+import com.cabin.entity.Client;
 import com.cabin.entity.FormInformation;
 import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
+import java.awt.SystemColor;
 
 public class ViewDetailDialog extends JDialog {
 
@@ -37,7 +39,7 @@ public class ViewDetailDialog extends JDialog {
      */
     public ViewDetailDialog(final FormInformation form, final TimerUtil timerUtil, final PWLauncher launcher) {
         final ViewDetailDialog thisDialog = this;
-        setBounds(100, 100, 489, 245);
+        setBounds(100, 100, 489, 264);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -58,7 +60,7 @@ public class ViewDetailDialog extends JDialog {
             contentPanel.add(pointsLabel);
         }
 
-        JLabel pointsValueLabel = new JLabel(String.valueOf(form.getClient().getPoints()));
+        final JLabel pointsValueLabel = new JLabel(String.valueOf(form.getClient().getPoints()));
         pointsValueLabel.setBounds(210, 31, 37, 14);
         contentPanel.add(pointsValueLabel);
         {
@@ -67,17 +69,17 @@ public class ViewDetailDialog extends JDialog {
             contentPanel.add(balanceLabel);
         }
 
-        JLabel balanceValueLabel = new JLabel(PRICE_FORMAT.format(form.getClient().getBalance()));
-        balanceValueLabel.setBounds(297, 31, 37, 14);
+        final JLabel balanceValueLabel = new JLabel(PRICE_FORMAT.format(form.getClient().getBalance()));
+        balanceValueLabel.setBounds(297, 31, 53, 14);
         contentPanel.add(balanceValueLabel);
         {
             experienceLabel = new JLabel("Experiencia:");
-            experienceLabel.setBounds(344, 31, 70, 14);
+            experienceLabel.setBounds(360, 31, 70, 14);
             contentPanel.add(experienceLabel);
         }
 
-        JLabel experienceValueLabel = new JLabel(String.valueOf(form.getClient().getExperience()));
-        experienceValueLabel.setBounds(418, 31, 37, 14);
+        final JLabel experienceValueLabel = new JLabel(String.valueOf(form.getClient().getExperience()));
+        experienceValueLabel.setBounds(434, 31, 37, 14);
         contentPanel.add(experienceValueLabel);
 
         JLabel groupLabel = new JLabel("Grupo PC:");
@@ -116,6 +118,11 @@ public class ViewDetailDialog extends JDialog {
         final JLabel bonusValueLabel = new JLabel("");
         bonusValueLabel.setBounds(354, 130, 49, 14);
         contentPanel.add(bonusValueLabel);
+        
+        final JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(SystemColor.inactiveCaptionText);
+        messageLabel.setBounds(33, 168, 264, 14);
+        contentPanel.add(messageLabel);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -125,11 +132,8 @@ public class ViewDetailDialog extends JDialog {
         buttonPane.add(viewBtn);
         viewBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("entra viewBonus");
                 int points = Integer.parseInt(newPointsTextField.getText());
-                System.out.println("entra viewBonus, points: " + points);
                 String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
-                System.out.println("entra viewBonus, balance: " + balance);
                 bonusValueLabel.setText(balance);
             }
         });
@@ -139,8 +143,13 @@ public class ViewDetailDialog extends JDialog {
         getRootPane().setDefaultButton(exchangeBtn);
         exchangeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
-                thisDialog.dispose();
+                Client client = new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
+                balanceValueLabel.setText(String.valueOf(client.getBalance()));
+                pointsValueLabel.setText(String.valueOf(client.getPoints()));
+                experienceValueLabel.setText(String.valueOf(client.getExperience()));
+                double hours = TimerUtil.getTimeAsHours(client.getBalance(), form.getTariff());
+                launcher.extendTime(hours);
+                messageLabel.setText("Canje de Puntos realizado satisfactoriamente.");
             }
         });
 
@@ -149,11 +158,8 @@ public class ViewDetailDialog extends JDialog {
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Long secondsUsed = timerUtil.getSecondsUsed();
-                System.out.println("secondsUsed : " + secondsUsed);
                 Long minutesUsed = new Long(secondsUsed / 60);
-                System.out.println("minutesUsed : " + minutesUsed);
                 double hoursUsed = minutesUsed / 60.0;
-                System.out.println("hoursUsed : " + hoursUsed);
                 double totalHours = round(hoursUsed);
                 double price = totalHours * form.getTariff();
                 new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
@@ -170,7 +176,7 @@ public class ViewDetailDialog extends JDialog {
             }
         });
 
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setVisible(true);
     }
 }

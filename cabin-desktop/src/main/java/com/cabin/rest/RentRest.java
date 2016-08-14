@@ -71,7 +71,7 @@ public class RentRest {
 
         Client client = Client.create(clientConfig);
 
-        String uri = HOST_SERVICES + "/put/endRentComputer";
+        String uri = HOST_SERVICES + "/put/exchangePoints";
         uri += "?rent_id=" + rentId;
         uri += "&bonusPoints=" + bonusPoints;
 
