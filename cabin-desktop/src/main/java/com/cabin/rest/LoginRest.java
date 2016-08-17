@@ -12,38 +12,38 @@ import com.sun.jersey.api.json.JSONConfiguration;
 
 public class LoginRest {
 
-	private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
+    private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
 
-	public com.cabin.entity.Client login(String email, String password) {
-		ClientConfig clientConfig = new DefaultClientConfig();
+    public com.cabin.entity.Client login(String email, String password) {
+        ClientConfig clientConfig = new DefaultClientConfig();
 
-		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-		String uri = HOST_SERVICES + "/post/login";
-		User user = new User();
-		user.setName(email);
-		user.setPass(password);
+        String uri = HOST_SERVICES + "/post/login";
+        User user = new User();
+        user.setName(email);
+        user.setPass(password);
 
-		WebResource webResource = Client.create(clientConfig).resource(uri);
-		ClientResponse response = webResource.accept("application/json").type("application/json")
-				.post(ClientResponse.class, user);
+        WebResource webResource = Client.create(clientConfig).resource(uri);
+        ClientResponse response = webResource.accept("application/json").type("application/json")
+                .post(ClientResponse.class, user);
 
-		if (response.getStatus() != 200) {
-			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
-		}
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+        }
 
-		String output = response.getEntity(String.class);
+        String output = response.getEntity(String.class);
 
-		System.out.println(output);
+        System.out.println(output);
 
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			com.cabin.entity.Client client = mapper.readValue(output, com.cabin.entity.Client.class);
-			System.out.println(client);
-			return client;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            com.cabin.entity.Client client = mapper.readValue(output, com.cabin.entity.Client.class);
+            System.out.println(client);
+            return client;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
