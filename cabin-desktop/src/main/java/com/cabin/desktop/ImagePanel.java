@@ -67,12 +67,20 @@ public class ImagePanel extends JPanel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (PWDialog.denying)
+        } else if (PWDialog.denying) {
             try {
-                BufferedImage i = ImageIO.read(getClass().getResource("/images/Deny.jpg"));
+                BufferedImage i = ImageIO.read(getClass().getResource("/images/wrongUser.jpg"));
                 g.drawImage(i, PWDialog.SCREENDIM.width / 2 - i.getWidth() / 2, (int) (PWDialog.SCREENDIM.height * 0.75D - i.getHeight() / 2), 465, 112, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else if (PWDialog.noBalance) {
+            try {
+                BufferedImage i = ImageIO.read(getClass().getResource("/images/noBalance.jpg"));
+                g.drawImage(i, PWDialog.SCREENDIM.width / 2 - i.getWidth() / 2, (int) (PWDialog.SCREENDIM.height * 0.75D - i.getHeight() / 2), 465, 112, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -51,6 +51,7 @@ public class PWDialog extends JDialog implements ActionListener {
     public static Dimension SCREENDIM;
     public static boolean accepting;
     public static boolean denying;
+    public static boolean noBalance;
     public static PWDialog instance;
     private PropertiesLoader propertiesLoader;
     private static final String PROPERTIES_FILE_NAME = "datos.properties";
@@ -58,6 +59,7 @@ public class PWDialog extends JDialog implements ActionListener {
     public PWDialog() {
         accepting = false;
         denying = false;
+        noBalance = false;
         SCREENDIM = getToolkit().getScreenSize();
         propertiesLoader = new PropertiesLoader(PROPERTIES_FILE_NAME);
 
@@ -79,12 +81,12 @@ public class PWDialog extends JDialog implements ActionListener {
         pwField = new PlaceholderPasswordField(10);
         pwField.setPlaceholder("Password");
         pwField.setAlignmentX(0.5F);
-        pwField.setMaximumSize(new Dimension(319, 55));
+        pwField.setMaximumSize(new Dimension(317, 50));
 
         txField = new PlaceholderTextField(10);
         txField.setPlaceholder("Email");
         txField.setAlignmentX(0.5F);
-        txField.setMaximumSize(new Dimension(319, 55));
+        txField.setMaximumSize(new Dimension(317, 50));
 
         ImageIcon myImage = new ImageIcon(getClass().getResource("/images/login-button.jpg"));
         loginBtn = new JButton(myImage);
@@ -95,9 +97,9 @@ public class PWDialog extends JDialog implements ActionListener {
         loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginBtn.addActionListener(this);
 
-        pwPanel.add(Box.createRigidArea(new Dimension(555, 222)));
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 224)));
         pwPanel.add(txField);
-        pwPanel.add(Box.createRigidArea(new Dimension(555, 21)));
+        pwPanel.add(Box.createRigidArea(new Dimension(555, 27)));
         pwPanel.add(pwField);
         pwPanel.add(Box.createRigidArea(new Dimension(555, 21)));
         pwPanel.add(loginBtn);
@@ -115,7 +117,7 @@ public class PWDialog extends JDialog implements ActionListener {
             }
 
             public void mouseMoved(MouseEvent me) {
-                if ((PWDialog.denying) || (PWDialog.accepting)) {
+                if ((PWDialog.denying) || (PWDialog.accepting) || (PWDialog.noBalance)) {
                     return;
                 }
                 int x = me.getLocationOnScreen().x;
@@ -201,6 +203,21 @@ public class PWDialog extends JDialog implements ActionListener {
             }
         }, 2000L);
     }
+    
+    public void noBalance() {
+        noBalance = true;
+        imagePanel.setImage("/images/Locked.jpg", new Dimension(259, 180));
+        showPanel("Card with Images");
+
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            public void run() {
+                clearPassword();
+                showPanel("Card with Password Field");
+                PWDialog.noBalance = false;
+            }
+        }, 2000L);
+    }
 
     public void showPanel(String title) {
         CardLayout cl = (CardLayout) mainPanel.getLayout();
@@ -217,7 +234,11 @@ public class PWDialog extends JDialog implements ActionListener {
 
         if (client != null) {
             System.out.println("loggin successfull");
-            accept(client);
+            if (client.getBalance() == 0) {
+                noBalance();
+            } else {
+                accept(client);
+            }
         } else {
             System.out.println("login failed");
             deny();
