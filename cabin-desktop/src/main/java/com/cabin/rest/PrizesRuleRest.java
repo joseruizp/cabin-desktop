@@ -7,29 +7,26 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
-public class PrizesRuleRest {
+public class PrizesRuleRest extends BaseRest {
 
-	private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
+    public String getBonification(long id, int points) {
+        ClientConfig clientConfig = new DefaultClientConfig();
 
-	public String getBonification(long id, int points) {
-		ClientConfig clientConfig = new DefaultClientConfig();
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+        String uri = getHost() + "/get/prizeByLevel";
+        uri += "?id=" + id;
+        uri += "&points=" + points;
 
-		String uri = HOST_SERVICES + "/get/prizeByLevel";
-		uri += "?id=" + id;
-		uri += "&points=" + points;
+        WebResource webResource = Client.create(clientConfig).resource(uri);
+        ClientResponse response = webResource.accept("application/json").type("application/json").get(ClientResponse.class);
 
-		WebResource webResource = Client.create(clientConfig).resource(uri);
-		ClientResponse response = webResource.accept("application/json").type("application/json")
-				.get(ClientResponse.class);
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+        }
 
-		if (response.getStatus() != 200) {
-			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
-		}
+        String output = response.getEntity(String.class);
 
-		String output = response.getEntity(String.class);
-
-		return output;
-	}
+        return output;
+    }
 }

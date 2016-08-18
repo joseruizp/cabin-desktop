@@ -9,9 +9,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
-public class RentRest {
-
-    private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
+public class RentRest extends BaseRest {
 
     public Long startRentComputer(Long clientId, Long computerId) {
         ClientConfig clientConfig = new DefaultClientConfig();
@@ -20,7 +18,7 @@ public class RentRest {
 
         Client client = Client.create(clientConfig);
 
-        String uri = HOST_SERVICES + "/put/startRentComputer";
+        String uri = getHost() + "/put/startRentComputer";
         uri += "?client_id=" + clientId;
         uri += "&computer_id=" + computerId;
 
@@ -46,7 +44,7 @@ public class RentRest {
 
         Client client = Client.create(clientConfig);
 
-        String uri = HOST_SERVICES + "/put/endRentComputer";
+        String uri = getHost() + "/put/endRentComputer";
         uri += "?rent_id=" + rentId;
         uri += "&rent_time=" + rentTime;
         uri += "&price=" + price;
@@ -71,7 +69,7 @@ public class RentRest {
 
         Client client = Client.create(clientConfig);
 
-        String uri = HOST_SERVICES + "/put/exchangePoints";
+        String uri = getHost() + "/put/exchangePoints";
         uri += "?rent_id=" + rentId;
         uri += "&bonusPoints=" + bonusPoints;
 

@@ -7,9 +7,8 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
-public class TariffRest {
+public class TariffRest extends BaseRest {
 
-    private static final String HOST_SERVICES = "http://localhost:8080/cabin-web/";
     private static final String PC = "P";
 
     public Double getTariff(long idGroup, long idHeadquarter) {
@@ -17,7 +16,7 @@ public class TariffRest {
 
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-        String uri = HOST_SERVICES + "/get/tariffPrice";
+        String uri = getHost() + "/get/tariffPrice";
         uri += "?idGroup=" + idGroup;
         uri += "&idHeadquarter=" + idHeadquarter;
         uri += "&pcConsole=" + PC;
