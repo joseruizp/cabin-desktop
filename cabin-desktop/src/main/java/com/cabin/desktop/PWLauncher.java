@@ -143,7 +143,18 @@ public class PWLauncher extends JDialog implements ActionListener {
             e.printStackTrace();
         }
     }
-
+    
+    public void stopComputer() {
+        trayIcon.setImage(createImage("images/LockedIcon.png"));
+        try {
+            this.timerUtil = null;
+            PWDialog.disposeInstance();
+            PWDialog.main(null);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static void showNotification(FormInformation form, double totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);

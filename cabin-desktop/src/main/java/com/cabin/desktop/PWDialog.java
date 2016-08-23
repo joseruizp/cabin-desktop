@@ -249,4 +249,10 @@ public class PWDialog extends JDialog implements ActionListener {
         System.out.println("in PWDialog");
         instance = new PWDialog();
     }
+    
+    public static void disposeInstance() {
+        if (instance != null) {
+            instance.dispose();
+        }
+    }
 }

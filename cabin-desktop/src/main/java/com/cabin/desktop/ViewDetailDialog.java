@@ -165,7 +165,7 @@ public class ViewDetailDialog extends JDialog {
                 new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
 
                 thisDialog.dispose();
-                launcher.blockComputer();
+                launcher.stopComputer();
             }
 
             private double round(double value) {

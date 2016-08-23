@@ -11,16 +11,19 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
 public class LoginRest extends BaseRest {
+    
+    private static final Long PROFILE_CLIENT_ID = 3L;
 
     public com.cabin.entity.Client login(String email, String password) {
         ClientConfig clientConfig = new DefaultClientConfig();
 
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-        String uri = getHost() + "/post/login";
+        String uri = getHost() + "/post/loginClient";
         User user = new User();
         user.setName(email);
         user.setPass(password);
+        user.setProfileId(PROFILE_CLIENT_ID);
 
         WebResource webResource = Client.create(clientConfig).resource(uri);
         ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, user);
