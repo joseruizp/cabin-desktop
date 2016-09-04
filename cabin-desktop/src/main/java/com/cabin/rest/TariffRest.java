@@ -30,7 +30,7 @@ public class TariffRest extends BaseRest {
 
         String output = response.getEntity(String.class);
 
-        System.out.println(output);
+        System.out.println("tariff : " + output);
 
         return Double.parseDouble(output);
     }

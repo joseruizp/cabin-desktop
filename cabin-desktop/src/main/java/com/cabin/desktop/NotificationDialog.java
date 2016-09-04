@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
+import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
 
@@ -24,8 +25,11 @@ public class NotificationDialog extends JDialog {
     }
 
     private TimerUtil timerUtil;
+    private final FormInformation formInformation;
+    private final JLabel availableBalanceValueLabel;
 
-    public NotificationDialog(String totalTime, final FormInformation form) {
+    public NotificationDialog(String totalTime, FormInformation form) {
+        this.formInformation = form;
         setTitle("Notifiaciones");
         setResizable(false);
         setBounds(100, 100, 728, 94);
@@ -40,8 +44,8 @@ public class NotificationDialog extends JDialog {
         JLabel availableBalanceLabel = new JLabel("Saldo Disponible:");
         getContentPane().add(availableBalanceLabel);
 
-        Double price = form.getClient().getBalance();
-        JLabel availableBalanceValueLabel = new JLabel(String.valueOf(round(price)));
+        Double price = this.formInformation.getClient().getBalance();
+        availableBalanceValueLabel = new JLabel(String.valueOf(PriceUtil.round(price)));
         getContentPane().add(availableBalanceValueLabel);
 
         JLabel restTimeLabel = new JLabel("Tiempo Restante:");
@@ -55,9 +59,7 @@ public class NotificationDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
-                timerUtil.stop();
-                PWLauncher launcher = new PWLauncher(timerUtil.getRemainingTime(), timerUtil.getSecondsUsed(), form);
-                launcher.showTimer();
+                new PWLauncher(timerUtil, formInformation);
                 thisDialog.dispose();
             }
         });
@@ -65,16 +67,13 @@ public class NotificationDialog extends JDialog {
         this.setVisible(true);
     }
     
-    private double round(double value) {
-        long factor = (long) Math.pow(10, 2);
-        double factorValue = value * factor;
-        long tmp = Math.round(factorValue);
-        return (double) tmp / factor;
-    }
-
     private void setTimer(final JLabel timerLabel, String totalTime) {
         this.timerUtil = new TimerUtil(totalTime, null, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("set timer notification: " + timerUtil.getRemainingTime());
+                formInformation.updateBalance(timerUtil.getRemainingTime());
+                Double price = formInformation.getClient().getBalance();
+                availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(price)));
                 timerLabel.setText(timerUtil.getRemainingTime());
             }
         });

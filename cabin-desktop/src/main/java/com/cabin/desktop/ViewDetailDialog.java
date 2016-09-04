@@ -33,6 +33,8 @@ public class ViewDetailDialog extends JDialog {
     private JLabel balanceLabel;
     private JLabel experienceLabel;
     private JTextField newPointsTextField;
+    
+    private JLabel balanceValueLabel;
 
     /**
      * Create the dialog.
@@ -69,7 +71,7 @@ public class ViewDetailDialog extends JDialog {
             contentPanel.add(balanceLabel);
         }
 
-        final JLabel balanceValueLabel = new JLabel(PRICE_FORMAT.format(form.getClient().getBalance()));
+        balanceValueLabel = new JLabel(PRICE_FORMAT.format(form.getClient().getBalance()));
         balanceValueLabel.setBounds(297, 31, 53, 14);
         contentPanel.add(balanceValueLabel);
         {
@@ -157,8 +159,7 @@ public class ViewDetailDialog extends JDialog {
         buttonPane.add(stopBtn);
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Long secondsUsed = timerUtil.getSecondsUsed();
-                Long minutesUsed = new Long(secondsUsed / 60);
+                Long minutesUsed = timerUtil.getMinutesUsed();
                 double hoursUsed = minutesUsed / 60.0;
                 double totalHours = round(hoursUsed);
                 double price = totalHours * form.getTariff();
@@ -178,5 +179,9 @@ public class ViewDetailDialog extends JDialog {
 
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setVisible(true);
+    }
+    
+    public JLabel getBalanceValueLabel() {
+        return this.balanceValueLabel;
     }
 }

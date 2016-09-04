@@ -13,39 +13,51 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 
 public class TimerUtil {
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
+    
+    private static final int ONE_MINUTE = 1000 * 60;
 
-    private Long totalSeconds;
-    private Long tempTotalSeconds;
-    private Long secondsUsed;
+    private Long totalMinutes;
+    private Long tempTotalMinutes;
+    private Long minutesUsed;
     private Timer timer;
+    private ActionListener actionListener;
 
-    public TimerUtil(String totalTime, Long secondsUsed, final ActionListener actionListener) {
+    public TimerUtil(String totalTime, Long minutesUsed, final ActionListener actionListener) {
         super();
-        this.totalSeconds = getTotalSeconds(totalTime);
-        this.tempTotalSeconds = totalSeconds;
-        this.secondsUsed = secondsUsed == null ? 0L : secondsUsed;
-
-        timer = new Timer(1000, new ActionListener() {
+        this.totalMinutes = getTotalMinutes(totalTime);
+        this.tempTotalMinutes = totalMinutes;
+        this.minutesUsed = minutesUsed == null ? 0L : minutesUsed;
+        
+        this.actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 decreaseTime();
                 actionListener.actionPerformed(e);
             }
-        });
+        };
+
+        timer = new Timer(ONE_MINUTE, this.actionListener);
         timer.start();
     }
-
-    private Long getTotalSeconds(String totalTime) {
-        try {
-            String[] split = totalTime.split(":");
-            if (split.length == 2) {
-                totalTime = totalTime.concat(":00");
+    
+    public void replaceActionListener(final ActionListener actionListener) {
+        this.timer.removeActionListener(this.actionListener);
+        this.actionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                decreaseTime();
+                actionListener.actionPerformed(e);
             }
+        };
+        this.timer.addActionListener(this.actionListener);
+    }
+
+    private Long getTotalMinutes(String totalTime) {
+        try {
             Date startDate = TIME_FORMAT.parse(totalTime);
-            return startDate.getTime() / 1000L;
+            return startDate.getTime() / ONE_MINUTE;
         } catch (ParseException e) {
             e.printStackTrace();
             return 0L;
@@ -53,32 +65,36 @@ public class TimerUtil {
     }
 
     private void decreaseTime() {
-        totalSeconds--;
-        secondsUsed++;
+        totalMinutes--;
+        minutesUsed++;
     }
 
     public String getRemainingTime() {
-        Long miliseconds = (totalSeconds * 1000) - 1000;
-        return DurationFormatUtils.formatDuration(miliseconds, "HH:mm:ss", true);
+        Long miliseconds = (totalMinutes * 60 * 1000);
+        return DurationFormatUtils.formatDuration(miliseconds, "HH:mm", true);
     }
 
-    public Long getSecondsUsed() {
-        return secondsUsed;
+    public Long getMinutesUsed() {
+        return minutesUsed;
     }
 
     public void stop() {
         timer.stop();
     }
+    
+    public boolean isShowNotification() {
+        return (totalMinutes == 10 || totalMinutes == 5 || totalMinutes == 3);
+    }
 
     public boolean isOver() {
-        return (totalSeconds == 1 || totalSeconds == 0);
+        return (totalMinutes == 0);
     }
     
     public void extendTime(double newTotalHours) {
-        Long newTotalSeconds = (long) (newTotalHours * 60.0 * 60.0);
-        Long extraTime = newTotalSeconds - this.tempTotalSeconds;
-        this.totalSeconds += extraTime;
-        this.tempTotalSeconds = this.totalSeconds;
+        Long newTotalMinutes = (long) (newTotalHours * 60.0);
+        Long extraTime = newTotalMinutes - this.tempTotalMinutes;
+        this.totalMinutes += extraTime;
+        this.tempTotalMinutes = this.totalMinutes;
     }
 
     public static double getTimeAsHours(double balance, double tariff) {
@@ -103,7 +119,7 @@ public class TimerUtil {
         String hourString = hour < 10 ? ("0" + hour) : (Long.toString(hour));
         long minutes = Math.round(60 * fraction);
         String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
-        return hourString + ":" + minutesString + ":00";
+        return hourString + ":" + minutesString;
     }
 
 }
