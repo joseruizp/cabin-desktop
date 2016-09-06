@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -16,10 +17,13 @@ import javax.swing.border.EmptyBorder;
 
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
+import com.cabin.entity.Failure;
 import com.cabin.entity.FormInformation;
+import com.cabin.rest.FailureRest;
 import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
 import java.awt.SystemColor;
+import javax.swing.JComboBox;
 
 public class ViewDetailDialog extends JDialog {
 
@@ -33,7 +37,7 @@ public class ViewDetailDialog extends JDialog {
     private JLabel balanceLabel;
     private JLabel experienceLabel;
     private JTextField newPointsTextField;
-    
+
     private JLabel balanceValueLabel;
 
     /**
@@ -41,7 +45,11 @@ public class ViewDetailDialog extends JDialog {
      */
     public ViewDetailDialog(final FormInformation form, final TimerUtil timerUtil, final PWLauncher launcher) {
         final ViewDetailDialog thisDialog = this;
-        setBounds(100, 100, 489, 264);
+
+        final FailureRest failureRest = new FailureRest();
+        final List<Failure> failures = failureRest.getFailures();
+
+        setBounds(100, 100, 489, 297);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -120,15 +128,42 @@ public class ViewDetailDialog extends JDialog {
         final JLabel bonusValueLabel = new JLabel("");
         bonusValueLabel.setBounds(354, 130, 49, 14);
         contentPanel.add(bonusValueLabel);
-        
+
         final JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(SystemColor.inactiveCaptionText);
-        messageLabel.setBounds(33, 168, 264, 14);
+        messageLabel.setBounds(33, 201, 264, 14);
         contentPanel.add(messageLabel);
+
+        JLabel failureLabel = new JLabel("Tipo de Falla:");
+        failureLabel.setBounds(33, 171, 90, 14);
+        contentPanel.add(failureLabel);
+
+        final JComboBox<String> failureCombo = new JComboBox<String>();
+        failureCombo.setBounds(137, 168, 28, 20);
+
+        failureCombo.addItem("Seleccionar");
+        for (Failure failure : failures) {
+            failureCombo.addItem(failure.getName());
+        }
+
+        contentPanel.add(failureCombo);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
+        JButton btnReportarFalla = new JButton("Reportar Falla");
+        btnReportarFalla.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int index = failureCombo.getSelectedIndex();
+                if (index > 0) {
+                    Failure failure = failures.get(index - 1);
+                    failureRest.reportFailure(form.getComputer().getId(), failure.getId());
+                    messageLabel.setText("Falla del equipo reportada.");
+                }
+            }
+        });
+        buttonPane.add(btnReportarFalla);
 
         JButton viewBtn = new JButton("Ver Bono");
         buttonPane.add(viewBtn);
@@ -180,7 +215,7 @@ public class ViewDetailDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setVisible(true);
     }
-    
+
     public JLabel getBalanceValueLabel() {
         return this.balanceValueLabel;
     }
