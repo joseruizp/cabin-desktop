@@ -139,7 +139,7 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(failureLabel);
 
         final JComboBox<String> failureCombo = new JComboBox<String>();
-        failureCombo.setBounds(137, 168, 28, 20);
+        failureCombo.setBounds(137, 168, 98, 20);
 
         failureCombo.addItem("Seleccionar");
         for (Failure failure : failures) {

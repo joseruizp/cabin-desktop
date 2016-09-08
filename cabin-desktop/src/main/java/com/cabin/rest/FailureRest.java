@@ -48,12 +48,12 @@ public class FailureRest extends BaseRest {
 
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-        String uri = getHost() + "/post/report";
-        uri += "?computerid=" + computerId;
-        uri += "?falureid=" + failureId;
+        String uri = getHost() + "/put/report";
+        uri += "?computerId=" + computerId;
+        uri += "?falureId=" + failureId;
 
         WebResource webResource = Client.create(clientConfig).resource(uri);
-        ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class);
+        ClientResponse response = webResource.accept("application/json").type("application/json").put(ClientResponse.class);
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());

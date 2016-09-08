@@ -125,32 +125,13 @@ public class FormDialog extends JDialog {
         rentAndExchangeButton = new JButton();
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(new ColumnSpec[] {
-        		ColumnSpec.decode("30dlu"),
-        		FormSpecs.DEFAULT_COLSPEC,
-        		ColumnSpec.decode("50dlu"),
-        		ColumnSpec.decode("max(48dlu;default)"),
-        		ColumnSpec.decode("19dlu"),
-        		ColumnSpec.decode("55dlu"),
-        		ColumnSpec.decode("98dlu"),
-        		ColumnSpec.decode("max(63dlu;default)"),
-        		ColumnSpec.decode("40dlu"),},
-        	new RowSpec[] {
-        		FormSpecs.DEFAULT_ROWSPEC,
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("25dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("25dlu"),
-        		RowSpec.decode("19dlu"),
-        		RowSpec.decode("20dlu"),}));
+        contentPane.setLayout(new FormLayout(
+                new ColumnSpec[] { ColumnSpec.decode("30dlu"), FormSpecs.DEFAULT_COLSPEC, ColumnSpec.decode("50dlu"), ColumnSpec.decode("max(48dlu;default)"),
+                        ColumnSpec.decode("19dlu"), ColumnSpec.decode("55dlu"), ColumnSpec.decode("98dlu"), ColumnSpec.decode("max(63dlu;default)"),
+                        ColumnSpec.decode("40dlu"), },
+                new RowSpec[] { FormSpecs.DEFAULT_ROWSPEC, RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"),
+                        RowSpec.decode("19dlu"), RowSpec.decode("25dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("19dlu"),
+                        RowSpec.decode("19dlu"), RowSpec.decode("19dlu"), RowSpec.decode("25dlu"), RowSpec.decode("19dlu"), RowSpec.decode("20dlu"), }));
 
         contentPane.setBackground(new Color(1.0F, 1.0F, 1.0F, 0.0F));
         userLabel.setText("Usuario:");
@@ -203,7 +184,7 @@ public class FormDialog extends JDialog {
         viewBonus = new JButton(myImage);
         viewBonus.setPreferredSize(new Dimension(50, 25));
         viewBonus.setMinimumSize(new Dimension(50, 25));
-        viewBonus.setMaximumSize(new Dimension(50, 25));        
+        viewBonus.setMaximumSize(new Dimension(50, 25));
         viewBonus.setAlignmentX(0.5F);
         viewBonus.setOpaque(false);
         viewBonus.setContentAreaFilled(false);
@@ -266,7 +247,7 @@ public class FormDialog extends JDialog {
         rentButton = new JButton(myImage);
         rentButton.setPreferredSize(new Dimension(150, 100));
         rentButton.setMinimumSize(new Dimension(150, 100));
-        rentButton.setMaximumSize(new Dimension(150, 100));        
+        rentButton.setMaximumSize(new Dimension(150, 100));
         rentButton.setAlignmentX(0.5F);
         rentButton.setOpaque(false);
         rentButton.setContentAreaFilled(false);
