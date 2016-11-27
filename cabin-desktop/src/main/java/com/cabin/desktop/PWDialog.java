@@ -83,11 +83,13 @@ public class PWDialog extends JDialog implements ActionListener {
         pwField.setPlaceholder("Password");
         pwField.setAlignmentX(0.5F);
         pwField.setMaximumSize(new Dimension(317, 50));
+        pwField.addActionListener(this);
 
         txField = new PlaceholderTextField(10);
         txField.setPlaceholder("Email");
         txField.setAlignmentX(0.5F);
         txField.setMaximumSize(new Dimension(317, 50));
+        txField.addActionListener(this);
 
         ImageIcon myImage = new ImageIcon(getClass().getResource("/images/login-button.jpg"));
         loginBtn = new JButton(myImage);
