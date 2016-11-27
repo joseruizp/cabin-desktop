@@ -33,6 +33,7 @@ import com.cabin.entity.Computer;
 import com.cabin.entity.FormInformation;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
+import com.cabin.rest.RechargeSocket;
 import com.cabin.rest.RentRest;
 import com.cabin.rest.TariffRest;
 
@@ -168,6 +169,7 @@ public class PWDialog extends JDialog implements ActionListener {
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         final Long headquarterId = propertiesLoader.getLong("id_sede");
         final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
+        // new RechargeSocket(1L).listener();
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
@@ -203,7 +205,7 @@ public class PWDialog extends JDialog implements ActionListener {
             }
         }, 2000L);
     }
-    
+
     public void noBalance() {
         noBalance = true;
         imagePanel.setImage("/images/Locked.jpg", new Dimension(259, 180));
@@ -249,7 +251,7 @@ public class PWDialog extends JDialog implements ActionListener {
         System.out.println("in PWDialog");
         instance = new PWDialog();
     }
-    
+
     public static void disposeInstance() {
         if (instance != null) {
             instance.dispose();

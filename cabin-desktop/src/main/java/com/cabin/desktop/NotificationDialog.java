@@ -48,12 +48,7 @@ public class NotificationDialog extends JDialog {
         availableBalanceValueLabel = new JLabel(String.valueOf(PriceUtil.round(price)));
         getContentPane().add(availableBalanceValueLabel);
 
-        JLabel restTimeLabel = new JLabel("Tiempo Restante:");
-        getContentPane().add(restTimeLabel);
-
-        JLabel restTimeValueLabel = new JLabel(totalTime);
-        getContentPane().add(restTimeValueLabel);
-        setTimer(restTimeValueLabel, totalTime);
+        setTimer(totalTime);
 
         final NotificationDialog thisDialog = this;
         addWindowListener(new WindowAdapter() {
@@ -66,15 +61,14 @@ public class NotificationDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
-    
-    private void setTimer(final JLabel timerLabel, String totalTime) {
+
+    private void setTimer(String totalTime) {
         this.timerUtil = new TimerUtil(totalTime, null, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("set timer notification: " + timerUtil.getRemainingTime());
                 formInformation.updateBalance(timerUtil.getRemainingTime());
                 Double price = formInformation.getClient().getBalance();
                 availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(price)));
-                timerLabel.setText(timerUtil.getRemainingTime());
             }
         });
     }
