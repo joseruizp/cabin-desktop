@@ -32,7 +32,7 @@ public class RentRest extends BaseRest {
         String output = response.getEntity(String.class);
 
         System.out.println("Server response .... \n");
-        System.out.println(output);
+        System.out.println("output start rent: " + output);
 
         return Long.parseLong(output);
     }
@@ -59,7 +59,7 @@ public class RentRest extends BaseRest {
         String output = response.getEntity(String.class);
 
         System.out.println("Server response .... \n");
-        System.out.println(output);
+        System.out.println("output end rent: " + output);
     }
 
     public com.cabin.entity.Client exchangePoints(Long rentId, String bonusPoints) {
@@ -83,7 +83,7 @@ public class RentRest extends BaseRest {
         String output = response.getEntity(String.class);
 
         System.out.println("Server response .... \n");
-        System.out.println(output);
+        System.out.println("output exchange: " + output);
 
         try {
             ObjectMapper mapper = new ObjectMapper();

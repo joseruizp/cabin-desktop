@@ -1,5 +1,7 @@
 package com.cabin.entity;
 
+import com.cabin.common.TimerUtil;
+
 public class FormInformation {
 
     private Client client;
@@ -30,28 +32,9 @@ public class FormInformation {
     public Double getTariff() {
         return tariff;
     }
-    
+
     public void updateBalance(String remainingTime) {
-        double hour = getHours(remainingTime);
-        this.client.setBalance(hour * tariff);
-    }
-    
-    private double getHours(String remainingTime) {
-        double totalHours = 0.0;
-        int hour = Integer.parseInt(remainingTime.split(":")[0]);
-        totalHours += hour;
-        int min = Integer.parseInt(remainingTime.split(":")[1]);
-        if (min > 0) {
-            totalHours += (min / 60.0);
-        }
-        return round(totalHours);
-    }
-    
-    private static double round(double value) {
-        long factor = (long) Math.pow(10, 2);
-        double factorValue = value * factor;
-        long tmp = Math.round(factorValue);
-        return (double) tmp / factor;
+        this.client.setBalance(TimerUtil.getBalance(remainingTime, tariff));
     }
 
 }

@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
-import com.cabin.entity.FormInformation;
 
 public class NotificationDialog extends JDialog {
 
@@ -24,28 +23,35 @@ public class NotificationDialog extends JDialog {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private TimerUtil timerUtil;
-    private final FormInformation formInformation;
-    private final JLabel availableBalanceValueLabel;
+    private static TimerUtil timerUtil;
+    private static String totalTime;
+    private static Double balance;
+    private static Double tariff;
 
-    public NotificationDialog(String totalTime, FormInformation form) {
-        this.formInformation = form;
+    private static JLabel availableTimeValueLabel;
+    private static JLabel availableBalanceValueLabel;
+
+    private static NotificationDialog instance;
+
+    public NotificationDialog(String totalTime, Double balance, Double tariff) {
+        NotificationDialog.totalTime = totalTime;
+        NotificationDialog.balance = balance;
+        NotificationDialog.tariff = tariff;
         setTitle("Notifiaciones");
         setResizable(false);
         setBounds(100, 100, 728, 94);
         getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
 
-        JLabel avalidableTimeLabel = new JLabel("Tiempo Disponible:");
-        getContentPane().add(avalidableTimeLabel);
+        JLabel availableTimeLabel = new JLabel("Tiempo Disponible:");
+        getContentPane().add(availableTimeLabel);
 
-        JLabel availableTimeValueLabel = new JLabel(totalTime);
+        availableTimeValueLabel = new JLabel(totalTime);
         getContentPane().add(availableTimeValueLabel);
 
         JLabel availableBalanceLabel = new JLabel("Saldo Disponible:");
         getContentPane().add(availableBalanceLabel);
 
-        Double price = this.formInformation.getClient().getBalance();
-        availableBalanceValueLabel = new JLabel(String.valueOf(PriceUtil.round(price)));
+        availableBalanceValueLabel = new JLabel(String.valueOf(PriceUtil.round(balance)));
         getContentPane().add(availableBalanceValueLabel);
 
         setTimer(totalTime);
@@ -54,23 +60,59 @@ public class NotificationDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
-                new PWLauncher(timerUtil, formInformation);
+                // new PWLauncher(timerUtil, formInformation);
+                cleanStaticVariable();
+                PWLauncher.setDialogVisible(timerUtil);
                 thisDialog.dispose();
             }
         });
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setVisible(true);
+
+        instance = this;
+    }
+
+    private void cleanStaticVariable() {
+        availableTimeValueLabel = null;
+        availableBalanceValueLabel = null;
+        totalTime = null;
+        balance = null;
+        tariff = null;
+        instance = null;
     }
 
     private void setTimer(String totalTime) {
-        this.timerUtil = new TimerUtil(totalTime, null, new ActionListener() {
+        NotificationDialog.timerUtil = new TimerUtil(totalTime, null, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("set timer notification: " + timerUtil.getRemainingTime());
-                formInformation.updateBalance(timerUtil.getRemainingTime());
-                Double price = formInformation.getClient().getBalance();
-                availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(price)));
+                if (NotificationDialog.timerUtil != null) {
+                    System.out.println("set timer notification: " + NotificationDialog.timerUtil.getRemainingTime());
+                    NotificationDialog.balance = TimerUtil.getBalance(NotificationDialog.timerUtil.getRemainingTime(), NotificationDialog.tariff);
+                    availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
+                }
             }
         });
+    }
+
+    public static boolean isDialogVisible() {
+        if (instance == null) {
+            return false;
+        }
+        return instance.isVisible();
+    }
+
+    public static void updateBalance(Double balance) {
+        NotificationDialog.balance += balance;
+        availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
+
+        System.out.println("salto extendido :: " + NotificationDialog.balance);
+        double timeToExtend = TimerUtil.getTimeAsHours(balance, NotificationDialog.tariff);
+        System.out.println("tiempo extendido :: " + timeToExtend);
+        NotificationDialog.timerUtil.extendTime(timeToExtend);
+
+        double totalTime = TimerUtil.getHours(NotificationDialog.totalTime);
+        String extendedTime = TimerUtil.getHoursAsString(totalTime + timeToExtend);
+        System.out.println("time extended as string: " + extendedTime);
+        availableTimeValueLabel.setText(extendedTime);
     }
 
 }

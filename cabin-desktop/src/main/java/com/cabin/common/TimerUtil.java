@@ -17,7 +17,7 @@ public class TimerUtil {
     {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-    
+
     private static final int ONE_MINUTE = 1000 * 60;
 
     private Long totalMinutes;
@@ -31,7 +31,7 @@ public class TimerUtil {
         this.totalMinutes = getTotalMinutes(totalTime);
         this.tempTotalMinutes = totalMinutes;
         this.minutesUsed = minutesUsed == null ? 0L : minutesUsed;
-        
+
         this.actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 decreaseTime();
@@ -42,7 +42,7 @@ public class TimerUtil {
         timer = new Timer(ONE_MINUTE, this.actionListener);
         timer.start();
     }
-    
+
     public void replaceActionListener(final ActionListener actionListener) {
         this.timer.removeActionListener(this.actionListener);
         this.actionListener = new ActionListener() {
@@ -81,7 +81,7 @@ public class TimerUtil {
     public void stop() {
         timer.stop();
     }
-    
+
     public boolean isShowNotification() {
         return (totalMinutes == 10 || totalMinutes == 5 || totalMinutes == 3);
     }
@@ -89,7 +89,7 @@ public class TimerUtil {
     public boolean isOver() {
         return (totalMinutes == 0);
     }
-    
+
     public void extendTime(double newTotalHours) {
         Long newTotalMinutes = (long) (newTotalHours * 60.0);
         Long extraTime = newTotalMinutes - this.tempTotalMinutes;
@@ -120,6 +120,22 @@ public class TimerUtil {
         long minutes = Math.round(60 * fraction);
         String minutesString = minutes < 10 ? ("0" + minutes) : (Long.toString(minutes));
         return hourString + ":" + minutesString;
+    }
+
+    public static Double getBalance(String remainingTime, Double tariff) {
+        double hour = getHours(remainingTime);
+        return (hour * tariff);
+    }
+
+    public static double getHours(String remainingTime) {
+        double totalHours = 0.0;
+        int hour = Integer.parseInt(remainingTime.split(":")[0]);
+        totalHours += hour;
+        int min = Integer.parseInt(remainingTime.split(":")[1]);
+        if (min > 0) {
+            totalHours += (min / 60.0);
+        }
+        return round(totalHours);
     }
 
 }

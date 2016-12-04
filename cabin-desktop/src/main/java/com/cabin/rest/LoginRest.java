@@ -34,12 +34,12 @@ public class LoginRest extends BaseRest {
 
         String output = response.getEntity(String.class);
 
-        System.out.println(output);
+        System.out.println("output login: " + output);
 
         try {
             ObjectMapper mapper = new ObjectMapper();
             com.cabin.entity.Client client = mapper.readValue(output, com.cabin.entity.Client.class);
-            System.out.println(client);
+            System.out.println("client: " + client);
             return client;
         } catch (Exception e) {
             e.printStackTrace();

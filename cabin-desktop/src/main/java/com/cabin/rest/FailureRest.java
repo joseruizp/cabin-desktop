@@ -30,19 +30,17 @@ public class FailureRest extends BaseRest {
 
         String output = response.getEntity(String.class);
 
-        System.out.println(output);
-
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<Failure> failures = mapper.readValue(output, mapper.getTypeFactory().constructCollectionType(List.class, Failure.class));
-            System.out.println(failures);
+            System.out.println("failures: " + failures);
             return failures;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     public void reportFailure(Long computerId, Long failureId) {
         ClientConfig clientConfig = new DefaultClientConfig();
 
@@ -61,6 +59,6 @@ public class FailureRest extends BaseRest {
 
         String output = response.getEntity(String.class);
 
-        System.out.println(output);
+        System.out.println("failure: " + output);
     }
 }

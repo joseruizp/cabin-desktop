@@ -25,24 +25,17 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static boolean locked = false;
     private static TrayIcon trayIcon;
 
-    private boolean isLoggedIn;
-    private FormInformation form;
-    private TimerUtil timerUtil;
+    private static boolean isLoggedIn;
+    private static FormInformation form;
+    private static TimerUtil timerUtil;
+
+    private static PWLauncher instance;
 
     private static ViewDetailDialog viewDetailDialog;
 
-    public PWLauncher(TimerUtil timerUtil, FormInformation form) {
-        this();
-        this.timerUtil = timerUtil;
-        setTimer();
-        this.isLoggedIn = true;
-        this.form = form;
-        addViewDetailOption();
-        setUnlockedIcon();
-    }
-
     public PWLauncher() {
-        initSystemTray();
+        initSystemTray(this);
+        addViewDetailOption();
 
         setUndecorated(true);
         addWindowListener(new WindowAdapter() {
@@ -54,9 +47,10 @@ public class PWLauncher extends JDialog implements ActionListener {
 
         setFocusable(true);
         setVisible(true);
+        instance = this;
     }
 
-    private void initSystemTray() {
+    private static void initSystemTray(ActionListener actionListener) {
         if (!SystemTray.isSupported()) {
             System.out.println("SystemTray is not supported");
             return;
@@ -65,7 +59,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         SystemTray tray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(createImage("images/UnlockedIcon.png"));
         trayIcon.setToolTip("Sistema de Cabinas");
-        trayIcon.addActionListener(this);
+        trayIcon.addActionListener(actionListener);
 
         try {
             tray.add(trayIcon);
@@ -128,7 +122,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
     }
 
-    public void blockComputer() {
+    public static void blockComputer() {
         toggleIcon();
         String[] s = null;
         try {
@@ -141,7 +135,7 @@ public class PWLauncher extends JDialog implements ActionListener {
     public void stopComputer() {
         trayIcon.setImage(createImage("images/LockedIcon.png"));
         try {
-            this.timerUtil = null;
+            timerUtil = null;
             PWDialog.disposeInstance();
             PWDialog.main(null);
         } catch (AWTException e) {
@@ -150,31 +144,35 @@ public class PWLauncher extends JDialog implements ActionListener {
     }
 
     public static void showNotification(FormInformation form, double totalTime) {
+        PWLauncher.form = form;
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
-        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form);
+        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form.getClient().getBalance(), form.getTariff());
     }
 
-    private static void updateNotificationDialog(FormInformation form, String totalTime) {
+    private static void updateNotificationDialog(String totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
-        new NotificationDialog(totalTime, form);
+        new NotificationDialog(totalTime, form.getClient().getBalance(), form.getTariff());
     }
 
-    public void setTimer() {
-        this.timerUtil.replaceActionListener(new ActionListener() {
+    public static void setTimer() {
+        timerUtil.replaceActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("action listener launcher, " + timerUtil.getRemainingTime());
-                System.out.println("action listener launcher viewDetail visible, " + viewDetailDialog.isVisible());
                 form.updateBalance(timerUtil.getRemainingTime());
                 if (timerUtil.isShowNotification()) {
-                    viewDetailDialog.setVisible(false);
-                    updateNotificationDialog(form, timerUtil.getRemainingTime());
+                    if (viewDetailDialog != null) {
+                        viewDetailDialog.setVisible(false);
+                    }
+                    updateNotificationDialog(timerUtil.getRemainingTime());
                 } else if (timerUtil.isOver()) {
-                    viewDetailDialog.dispose();
+                    if (viewDetailDialog != null) {
+                        viewDetailDialog.dispose();
+                    }
                     timerUtil.stop();
                     blockComputer();
-                } else if (viewDetailDialog.isVisible()) {
+                } else if (viewDetailDialog != null && viewDetailDialog.isVisible()) {
                     Double price = form.getClient().getBalance();
                     viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(price)));
                 }
@@ -183,7 +181,28 @@ public class PWLauncher extends JDialog implements ActionListener {
     }
 
     public void extendTime(double hours) {
-        this.timerUtil.extendTime(hours);
+        timerUtil.extendTime(hours);
+    }
+
+    public static boolean isDialogVisible() {
+        return instance.isVisible();
+    }
+
+    public static void setDialogVisible(TimerUtil timerUtil) {
+        PWLauncher.timerUtil = timerUtil;
+        initSystemTray(instance);
+        setUnlockedIcon();
+        setTimer();
+        instance.setVisible(true);
+    }
+
+    public static void updateBalance(Double balance) {
+        form.getClient().setBalance(form.getClient().getBalance() + balance);
+
+        System.out.println("salto extendido :: " + form.getClient().getBalance());
+        double timeToExtend = TimerUtil.getTimeAsHours(balance, form.getTariff());
+        System.out.println("tiempo extendido :: " + timeToExtend);
+        timerUtil.extendTime(timeToExtend);
     }
 
     public static void main(String[] args) {

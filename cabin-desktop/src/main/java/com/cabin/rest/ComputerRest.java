@@ -29,12 +29,10 @@ public class ComputerRest extends BaseRest {
 
         String output = response.getEntity(String.class);
 
-        System.out.println(output);
-
         try {
             ObjectMapper mapper = new ObjectMapper();
             Computer computer = mapper.readValue(output, Computer.class);
-            System.out.println(computer);
+            System.out.println("computer: " + computer);
             return computer;
         } catch (Exception e) {
             e.printStackTrace();
