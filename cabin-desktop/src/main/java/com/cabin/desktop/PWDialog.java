@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +27,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.glassfish.tyrus.server.Server;
+
 import com.cabin.common.PropertiesLoader;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
@@ -33,9 +36,9 @@ import com.cabin.entity.Computer;
 import com.cabin.entity.FormInformation;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
-import com.cabin.rest.RechargeSocket;
 import com.cabin.rest.RentRest;
 import com.cabin.rest.TariffRest;
+import com.cabin.websocket.RechargeMessageEndpoint;
 
 public class PWDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -56,6 +59,7 @@ public class PWDialog extends JDialog implements ActionListener {
     public static PWDialog instance;
     private PropertiesLoader propertiesLoader;
     private static final String PROPERTIES_FILE_NAME = "datos.properties";
+    private static Server server;
 
     public PWDialog() {
         accepting = false;
@@ -167,11 +171,12 @@ public class PWDialog extends JDialog implements ActionListener {
         imagePanel.setImage("/images/Unlocked.jpg", new Dimension(259, 180));
         showPanel("Card with Images");
 
+        startWebSocket();
+
         final Dialog thisDialog = this;
         final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
         final Long headquarterId = propertiesLoader.getLong("id_sede");
         final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
-        // new RechargeSocket(1L).listener();
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             public void run() {
@@ -182,6 +187,16 @@ public class PWDialog extends JDialog implements ActionListener {
                 security.stop();
             }
         }, 900L);
+    }
+
+    private void startWebSocket() {
+        server = new Server("localhost", 8090, "/websockets", new HashMap<String, Object>(), RechargeMessageEndpoint.class);
+        try {
+            server.start();
+            System.out.println("websocket started");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void displayImage(String path, Dimension dims, Point point) {
@@ -257,6 +272,7 @@ public class PWDialog extends JDialog implements ActionListener {
     public static void disposeInstance() {
         if (instance != null) {
             instance.dispose();
+            server.stop();
         }
     }
 }
