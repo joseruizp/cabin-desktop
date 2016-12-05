@@ -105,7 +105,7 @@ public class NotificationDialog extends JDialog {
         availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
 
         System.out.println("salto extendido :: " + NotificationDialog.balance);
-        double timeToExtend = TimerUtil.getTimeAsHours(balance, NotificationDialog.tariff);
+        double timeToExtend = TimerUtil.getTimeAsHours(NotificationDialog.balance, NotificationDialog.tariff);
         System.out.println("tiempo extendido :: " + timeToExtend);
         NotificationDialog.timerUtil.extendTime(timeToExtend);
 

@@ -200,7 +200,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         form.getClient().setBalance(form.getClient().getBalance() + balance);
 
         System.out.println("salto extendido :: " + form.getClient().getBalance());
-        double timeToExtend = TimerUtil.getTimeAsHours(balance, form.getTariff());
+        double timeToExtend = TimerUtil.getTimeAsHours(form.getClient().getBalance(), form.getTariff());
         System.out.println("tiempo extendido :: " + timeToExtend);
         timerUtil.extendTime(timeToExtend);
     }
