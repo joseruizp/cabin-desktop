@@ -68,12 +68,11 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
     }
 
-    private void addViewDetailOption() {
+    private static void addViewDetailOption() {
         MenuItem exitItem = new MenuItem("Ver Detalle");
-        final PWLauncher thisDialog = this;
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showViewDetail(thisDialog);
+                showViewDetail(instance);
             }
         });
 
@@ -114,7 +113,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
     }
 
-    private void showViewDetail(PWLauncher launcher) {
+    private static void showViewDetail(PWLauncher launcher) {
         if (viewDetailDialog == null) {
             viewDetailDialog = new ViewDetailDialog(form, timerUtil, launcher);
         } else {
@@ -134,6 +133,7 @@ public class PWLauncher extends JDialog implements ActionListener {
 
     public void stopComputer() {
         trayIcon.setImage(createImage("images/LockedIcon.png"));
+        isLoggedIn = false;
         try {
             timerUtil = null;
             PWDialog.disposeInstance();
@@ -191,6 +191,8 @@ public class PWLauncher extends JDialog implements ActionListener {
     public static void setDialogVisible(TimerUtil timerUtil) {
         PWLauncher.timerUtil = timerUtil;
         initSystemTray(instance);
+        addViewDetailOption();
+        isLoggedIn = true;
         setUnlockedIcon();
         setTimer();
         instance.setVisible(true);
