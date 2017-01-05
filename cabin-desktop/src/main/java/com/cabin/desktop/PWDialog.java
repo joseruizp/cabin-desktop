@@ -27,6 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.apache.log4j.Logger;
 import org.glassfish.tyrus.server.Server;
 
 import com.cabin.common.PropertiesLoader;
@@ -41,6 +42,9 @@ import com.cabin.rest.TariffRest;
 import com.cabin.websocket.RechargeMessageEndpoint;
 
 public class PWDialog extends JDialog implements ActionListener {
+	
+	final static Logger logger = Logger.getLogger(PWDialog.class);
+
     private static final long serialVersionUID = 1L;
     private static final String pw = "123456";
     private PlaceholderPasswordField pwField;
