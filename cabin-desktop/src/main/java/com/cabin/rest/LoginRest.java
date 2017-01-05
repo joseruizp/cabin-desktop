@@ -1,6 +1,9 @@
 package com.cabin.rest;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.cabin.entity.User;
@@ -19,9 +22,8 @@ public class LoginRest extends BaseRest {
 
     public com.cabin.entity.Client login(String email, String password) {
         ClientConfig clientConfig = new DefaultClientConfig();
-
-        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);        
+        
         String uri = getHost() + "/post/loginClient";
         User user = new User();
         user.setName(email);
@@ -29,10 +31,20 @@ public class LoginRest extends BaseRest {
         user.setProfileId(PROFILE_CLIENT_ID);
         
         logger.info("uri login: " + uri);
-
-        WebResource webResource = Client.create(clientConfig).resource(uri);
-        ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, user);
-
+        WebResource webResource;
+        ClientResponse response; 
+        try{                	
+        	ObjectMapper map = new ObjectMapper();
+        	webResource = Client.create(clientConfig).resource(uri);
+        	response = webResource.header("Content-Type", MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, map.writeValueAsString(user));
+        }catch (Exception e) {
+        	logger.error(e.getMessage(), e);
+            e.printStackTrace();
+            return null;
+        }
+        
+        logger.info("status: " + response.getStatus());
+        
         if (response.getStatus() != 200) {
         	logger.error("error 200");
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
