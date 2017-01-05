@@ -15,11 +15,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 
+import org.apache.log4j.Logger;
+
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
 
 public class PWLauncher extends JDialog implements ActionListener {
+	
+	final static Logger logger = Logger.getLogger(PWLauncher.class);
+	
     private static final long serialVersionUID = -3759856811214634419L;
     public static PWDialog pwScreen = null;
     private static boolean locked = false;
@@ -34,6 +39,7 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static ViewDetailDialog viewDetailDialog;
 
     public PWLauncher() {
+    	logger.info("starting app");
         initSystemTray(this);
         addViewDetailOption();
 
