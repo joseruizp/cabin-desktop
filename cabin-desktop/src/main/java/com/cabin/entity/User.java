@@ -1,8 +1,14 @@
 package com.cabin.entity;
 
-public class User {
+import java.io.Serializable;
 
-    private String name;
+public class User implements Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2896207096244227836L;
+	private String name;
     private String pass;
     private Long profileId;
 
