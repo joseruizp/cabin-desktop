@@ -54,6 +54,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         setFocusable(true);
         setVisible(true);
         instance = this;
+        viewDetailDialog = null;
     }
 
     private static void initSystemTray(ActionListener actionListener) {
