@@ -132,6 +132,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         toggleIcon();
         String[] s = null;
         try {
+        	viewDetailDialog = null;
             PWDialog.main(s);
         } catch (AWTException e) {
             e.printStackTrace();
@@ -143,6 +144,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         isLoggedIn = false;
         try {
             timerUtil = null;
+            viewDetailDialog = null;
             PWDialog.disposeInstance();
             PWDialog.main(null);
         } catch (AWTException e) {
