@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
@@ -116,14 +118,11 @@ public class ViewDetailDialog extends JDialog {
         lblPuntosACanjear.setBounds(33, 130, 107, 14);
         contentPanel.add(lblPuntosACanjear);
 
-        newPointsTextField = new JTextField();
-        newPointsTextField.setBounds(139, 127, 59, 20);
-        contentPanel.add(newPointsTextField);
-        newPointsTextField.setColumns(10);
 
         JLabel bonusLabel = new JLabel("Saldo a Obtener:");
         bonusLabel.setBounds(257, 130, 101, 14);
-        contentPanel.add(bonusLabel);
+        contentPanel.add(bonusLabel);        
+        
 
         final JLabel bonusValueLabel = new JLabel("");
         bonusValueLabel.setBounds(354, 130, 49, 14);
@@ -131,9 +130,48 @@ public class ViewDetailDialog extends JDialog {
 
         final JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(SystemColor.inactiveCaptionText);
-        messageLabel.setBounds(33, 201, 264, 14);
+        messageLabel.setBounds(33, 201, 300, 14);
         contentPanel.add(messageLabel);
 
+        
+        newPointsTextField = new JTextField();
+        newPointsTextField.setBounds(139, 127, 59, 20);
+        contentPanel.add(newPointsTextField);
+        newPointsTextField.setColumns(10);
+        newPointsTextField.getDocument().addDocumentListener(new DocumentListener() {
+        	public void changedUpdate(DocumentEvent e) {
+        		getBonus();
+        	}
+			public void removeUpdate(DocumentEvent e) {
+				getBonus();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				getBonus();
+			}
+			public void getBonus() {
+				int points = 0;
+				if ( !newPointsTextField.getText().isEmpty() )					
+					points = Integer.parseInt(newPointsTextField.getText());
+				else{
+					bonusValueLabel.setText("");
+				}
+                if ( points <= form.getClient().getPoints() ){
+                	if ( points > 0){
+                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+                		bonusValueLabel.setText(balance);
+                	}
+                	else{
+                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+                		bonusValueLabel.setText("");
+                	}                	
+                }
+                else{
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
+            		bonusValueLabel.setText("");
+                }
+			}
+        });
+        
         JLabel failureLabel = new JLabel("Tipo de Falla:");
         failureLabel.setBounds(33, 171, 90, 14);
         contentPanel.add(failureLabel);
@@ -164,29 +202,51 @@ public class ViewDetailDialog extends JDialog {
             }
         });
         buttonPane.add(btnReportarFalla);
-
+        
+        /*
         JButton viewBtn = new JButton("Ver Bono");
         buttonPane.add(viewBtn);
         viewBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int points = Integer.parseInt(newPointsTextField.getText());
-                String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
-                bonusValueLabel.setText(balance);
+                if ( points <= form.getClient().getPoints() ){
+                	if ( points > 0){
+                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+                		bonusValueLabel.setText(balance);
+                	}
+                	else{
+                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+                	}                	
+                }
+                else
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
             }
         });
-
+        */
+        
         JButton exchangeBtn = new JButton("Canjear");
         buttonPane.add(exchangeBtn);
         getRootPane().setDefaultButton(exchangeBtn);
         exchangeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Client client = new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
-                balanceValueLabel.setText(String.valueOf(client.getBalance()));
-                pointsValueLabel.setText(String.valueOf(client.getPoints()));
-                experienceValueLabel.setText(String.valueOf(client.getExperience()));
-                double hours = TimerUtil.getTimeAsHours(client.getBalance(), form.getTariff());
-                launcher.extendTime(hours);
-                messageLabel.setText("Canje de Puntos realizado satisfactoriamente.");
+            	Integer points = Integer.parseInt(newPointsTextField.getText());
+            	if ( points <= form.getClient().getPoints() ){
+            		if ( points > 0){
+		                Client client = new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
+		                balanceValueLabel.setText(String.valueOf(client.getBalance()));
+		                pointsValueLabel.setText(String.valueOf(client.getPoints()));
+		                experienceValueLabel.setText(String.valueOf(client.getExperience()));
+		                double hours = TimerUtil.getTimeAsHours(client.getBalance(), form.getTariff());
+		                launcher.extendTime(hours);
+		                messageLabel.setText("Canje de Puntos realizado satisfactoriamente.");
+		                newPointsTextField.setText("");
+		                bonusValueLabel.setText("");
+            		}
+            		else
+            			messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+            	}
+            	else
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
             }
         });
 
