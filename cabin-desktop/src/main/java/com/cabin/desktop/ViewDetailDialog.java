@@ -38,6 +38,7 @@ public class ViewDetailDialog extends JDialog {
     private JLabel pointsLabel;
     private JLabel balanceLabel;
     private JLabel experienceLabel;
+    private JLabel nivelLabel;
     private JTextField newPointsTextField;
 
     private JLabel balanceValueLabel;
@@ -51,7 +52,7 @@ public class ViewDetailDialog extends JDialog {
         final FailureRest failureRest = new FailureRest();
         final List<Failure> failures = failureRest.getFailures();
 
-        setBounds(100, 100, 489, 297);
+        setBounds(100, 100, 500, 297);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -94,24 +95,34 @@ public class ViewDetailDialog extends JDialog {
         experienceValueLabel.setBounds(434, 31, 37, 14);
         contentPanel.add(experienceValueLabel);
 
+        {
+            nivelLabel = new JLabel("Nivel:");
+            nivelLabel.setBounds(33, 82, 40, 14);
+            contentPanel.add(nivelLabel);
+        }
+        
+        final JLabel nivelValueLabel = new JLabel(String.valueOf(form.getClient().getLevel().getName()));
+        nivelValueLabel.setBounds(73, 82, 80, 14);
+        contentPanel.add(nivelValueLabel);
+        
         JLabel groupLabel = new JLabel("Grupo PC:");
-        groupLabel.setBounds(33, 82, 62, 14);
+        groupLabel.setBounds(163, 82, 67, 14);
         contentPanel.add(groupLabel);
 
         JLabel groupValueLabel = new JLabel(form.getComputer().getGroup().getName());
-        groupValueLabel.setBounds(93, 82, 117, 14);
+        groupValueLabel.setBounds(230, 82, 80, 14);
         contentPanel.add(groupValueLabel);
 
         JLabel tariffLabel = new JLabel("Tarifa:");
-        tariffLabel.setBounds(257, 82, 42, 14);
+        tariffLabel.setBounds(320, 82, 42, 14);
         contentPanel.add(tariffLabel);
 
         JLabel tariffValueLabel = new JLabel(PRICE_FORMAT.format(form.getTariff()));
-        tariffValueLabel.setBounds(297, 82, 32, 14);
+        tariffValueLabel.setBounds(362, 82, 18, 14);
         contentPanel.add(tariffValueLabel);
 
-        JLabel lblPorHora = new JLabel("por Hora");
-        lblPorHora.setBounds(335, 82, 52, 14);
+        JLabel lblPorHora = new JLabel("soles/hora");
+        lblPorHora.setBounds(380, 82, 60, 14);
         contentPanel.add(lblPorHora);
 
         JLabel lblPuntosACanjear = new JLabel("Puntos a Canjear:");
