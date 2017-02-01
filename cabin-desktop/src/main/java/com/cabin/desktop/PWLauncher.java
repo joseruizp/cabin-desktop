@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.FormInformation;
+import com.cabin.rest.RentRest;
 
 public class PWLauncher extends JDialog implements ActionListener {
 	
@@ -178,9 +179,14 @@ public class PWLauncher extends JDialog implements ActionListener {
                 } else if (timerUtil.isOver()) {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.dispose();
-                    }
-                    timerUtil.stop();
-                    blockComputer();
+                    }                    
+                    Long minutesUsed = timerUtil.getMinutesUsed();
+                    double hoursUsed = minutesUsed / 60.0;
+                    double totalHours = round(hoursUsed);
+                    double price = totalHours * form.getTariff();
+                    new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+
+                    instance.stopComputer();
                 } else if (viewDetailDialog != null && viewDetailDialog.isVisible()) {
                     Double price = form.getClient().getBalance();
                     viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(price)));
@@ -216,8 +222,17 @@ public class PWLauncher extends JDialog implements ActionListener {
         timerUtil.extendTime(timeToExtend);
     }
 
+    private static double round(double value) {
+        long factor = (long) Math.pow(10, 2);
+        double factorValue = value * factor;
+        long tmp = Math.round(factorValue);
+        return (double) tmp / factor;
+    }
+    
     public static void main(String[] args) {
         new PWLauncher();
     }
+    
+    
 
 }
