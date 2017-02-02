@@ -17,7 +17,8 @@ public class Client implements Serializable {
 	private Integer experience;
 	private Status status;
 	private Level level;
-
+	private String change_level;
+	
 	public Long getId() {
 		return id;
 	}
@@ -82,10 +83,18 @@ public class Client implements Serializable {
 		this.level = level;
 	}
 
+	public String getChange_level() {
+		return change_level;
+	}
+
+	public void setChange_level(String change_level) {
+		this.change_level = change_level;
+	}
+
 	@Override
 	public String toString() {
 		return "Client [id=" + id + ", email=" + email + ", name=" + name + ", balance=" + balance + ", points="
-				+ points + ", experience=" + experience + ", status=" + status + ", level=" + level + "]";
+				+ points + ", experience=" + experience + ", status=" + status + ", level=" + level + ", change_level=" + change_level + "]";
 	}
 
 }

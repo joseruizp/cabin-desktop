@@ -14,12 +14,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
+import com.cabin.entity.Client;
 import com.cabin.entity.FormInformation;
+import com.cabin.rest.ClientRest;
 import com.cabin.rest.RentRest;
 
 public class PWLauncher extends JDialog implements ActionListener {
@@ -157,12 +161,19 @@ public class PWLauncher extends JDialog implements ActionListener {
         PWLauncher.form = form;
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
+        JFrame parent = new JFrame();        
+        String change_level = "0";
+        if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
+        	PWLauncher.form.getClient().setChange_level(change_level);
+        	new ClientRest().changeLevel(form.getRentId(), change_level);        	
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + form.getClient().getLevel().getName());
+        }
         new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form.getClient().getBalance(), form.getTariff());
     }
 
     private static void updateNotificationDialog(String totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
-        tray.remove(trayIcon);
+        tray.remove(trayIcon);        
         new NotificationDialog(totalTime, form.getClient().getBalance(), form.getTariff());
     }
 
@@ -213,7 +224,14 @@ public class PWLauncher extends JDialog implements ActionListener {
         instance.setVisible(true);
     }
 
-    public static void updateBalance(Double balance) {
+    public static void updateBalance(Double balance) {    	
+    	JFrame parent = new JFrame();        
+        String change_level = "0";
+        if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
+        	PWLauncher.form.getClient().setChange_level(change_level);
+        	new ClientRest().changeLevel(form.getRentId(), change_level);        	
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + form.getClient().getLevel().getName());
+        }
         form.getClient().setBalance(form.getClient().getBalance() + balance);
 
         System.out.println("salto extendido :: " + form.getClient().getBalance());
