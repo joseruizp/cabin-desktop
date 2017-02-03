@@ -18,7 +18,17 @@ public class Client implements Serializable {
 	private Status status;
 	private Level level;
 	private String change_level;
+	private Long id_bonification;
+	private String bonus;
 	
+	public Long getId_bonification() {
+		return id_bonification;
+	}
+
+	public void setId_bonification(Long id_bonification) {
+		this.id_bonification = id_bonification;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -91,10 +101,18 @@ public class Client implements Serializable {
 		this.change_level = change_level;
 	}
 
+	public String getBonus() {
+		return bonus;
+	}
+
+	public void setBonus(String bonus) {
+		this.bonus = bonus;
+	}
+
 	@Override
 	public String toString() {
 		return "Client [id=" + id + ", email=" + email + ", name=" + name + ", balance=" + balance + ", points="
-				+ points + ", experience=" + experience + ", status=" + status + ", level=" + level + ", change_level=" + change_level + "]";
+				+ points + ", experience=" + experience + ", status=" + status + ", level=" + level + ", change_level=" + change_level + "], bonus=" + bonus + "]";
 	}
 
 }

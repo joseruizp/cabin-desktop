@@ -164,11 +164,20 @@ public class PWLauncher extends JDialog implements ActionListener {
         JFrame parent = new JFrame();        
         String change_level = "0";
         if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
-        	PWLauncher.form.getClient().setChange_level(change_level);
-        	new ClientRest().changeLevel(form.getRentId(), change_level);        	
-        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + form.getClient().getLevel().getName());
+        	PWLauncher.form.getClient().setChange_level(change_level);        	
+        	Client clientAux = new ClientRest().changeLevel(form.getRentId(), change_level);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + clientAux.getLevel().getName());
         }
-        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form.getClient().getBalance(), form.getTariff());
+        String bonus = "0";        
+        if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
+        	PWLauncher.form.getClient().setBonus(bonus);
+        	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
+        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	PWLauncher.form.getClient().setBalance(form.getClient().getBalance() + bonification);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
+        }
+        
+        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), PWLauncher.form.getClient().getBalance(), PWLauncher.form.getTariff());
     }
 
     private static void updateNotificationDialog(String totalTime) {
@@ -228,11 +237,26 @@ public class PWLauncher extends JDialog implements ActionListener {
     	JFrame parent = new JFrame();        
         String change_level = "0";
         if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
-        	PWLauncher.form.getClient().setChange_level(change_level);
-        	new ClientRest().changeLevel(form.getRentId(), change_level);        	
+        	form.getClient().setChange_level(change_level);
+        	Client clientAux = new ClientRest().changeLevel(form.getRentId(), change_level);
+        	form.getClient().setPoints(clientAux.getPoints());
+        	form.getClient().setExperience(clientAux.getExperience());
+        	form.getClient().setLevel(clientAux.getLevel());
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + form.getClient().getLevel().getName());
         }
+        
         form.getClient().setBalance(form.getClient().getBalance() + balance);
+        
+        String bonus = "0";        
+        if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
+        	form.getClient().setBonus(bonus);
+        	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
+        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	form.getClient().setPoints(clientAux.getPoints());
+        	form.getClient().setExperience(clientAux.getExperience());       
+        	form.getClient().setBalance(form.getClient().getBalance() + bonification);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
+        }
 
         System.out.println("salto extendido :: " + form.getClient().getBalance());
         double timeToExtend = TimerUtil.getTimeAsHours(form.getClient().getBalance(), form.getTariff());
