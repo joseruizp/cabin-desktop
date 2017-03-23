@@ -72,7 +72,9 @@ public class RentRest extends BaseRest {
         String uri = getHost() + "/put/exchangePoints";
         uri += "?rent_id=" + rentId;
         uri += "&bonusPoints=" + bonusPoints;
-
+        
+        System.out.println("URL: " + uri);
+        
         WebResource webResource = client.resource(uri);
         ClientResponse response = webResource.accept("application/json").type("application/json").put(ClientResponse.class);
 
@@ -92,5 +94,7 @@ public class RentRest extends BaseRest {
             e.printStackTrace();
             return null;
         }
-    }
+    }    
+    
+
 }

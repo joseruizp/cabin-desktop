@@ -14,12 +14,17 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
+import com.cabin.entity.Client;
 import com.cabin.entity.FormInformation;
+import com.cabin.rest.ClientRest;
+import com.cabin.rest.RentRest;
 
 public class PWLauncher extends JDialog implements ActionListener {
 	
@@ -132,6 +137,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         toggleIcon();
         String[] s = null;
         try {
+        	viewDetailDialog = null;
             PWDialog.main(s);
         } catch (AWTException e) {
             e.printStackTrace();
@@ -143,6 +149,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         isLoggedIn = false;
         try {
             timerUtil = null;
+            viewDetailDialog = null;
             PWDialog.disposeInstance();
             PWDialog.main(null);
         } catch (AWTException e) {
@@ -154,12 +161,28 @@ public class PWLauncher extends JDialog implements ActionListener {
         PWLauncher.form = form;
         SystemTray tray = SystemTray.getSystemTray();
         tray.remove(trayIcon);
-        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), form.getClient().getBalance(), form.getTariff());
+        JFrame parent = new JFrame();        
+        String change_level = "0";
+        if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
+        	PWLauncher.form.getClient().setChange_level(change_level);        	
+        	Client clientAux = new ClientRest().changeLevel(form.getRentId(), change_level);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + clientAux.getLevel().getName());
+        }
+        String bonus = "0";        
+        if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
+        	PWLauncher.form.getClient().setBonus(bonus);
+        	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
+        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	PWLauncher.form.getClient().setBalance(form.getClient().getBalance() + bonification);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
+        }
+        
+        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), PWLauncher.form.getClient().getBalance(), PWLauncher.form.getTariff());
     }
 
     private static void updateNotificationDialog(String totalTime) {
         SystemTray tray = SystemTray.getSystemTray();
-        tray.remove(trayIcon);
+        tray.remove(trayIcon);        
         new NotificationDialog(totalTime, form.getClient().getBalance(), form.getTariff());
     }
 
@@ -176,9 +199,14 @@ public class PWLauncher extends JDialog implements ActionListener {
                 } else if (timerUtil.isOver()) {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.dispose();
-                    }
-                    timerUtil.stop();
-                    blockComputer();
+                    }                    
+                    Long minutesUsed = timerUtil.getMinutesUsed();
+                    double hoursUsed = minutesUsed / 60.0;
+                    double totalHours = round(hoursUsed);
+                    double price = totalHours * form.getTariff();
+                    new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+
+                    instance.stopComputer();
                 } else if (viewDetailDialog != null) {
                     Double price = form.getClient().getBalance();
                     viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(price)));
@@ -205,8 +233,30 @@ public class PWLauncher extends JDialog implements ActionListener {
         instance.setVisible(true);
     }
 
-    public static void updateBalance(Double balance) {
+    public static void updateBalance(Double balance) {    	
+    	JFrame parent = new JFrame();        
+        String change_level = "0";
+        if ( Integer.parseInt(form.getClient().getChange_level()) == 1 ){
+        	form.getClient().setChange_level(change_level);
+        	Client clientAux = new ClientRest().changeLevel(form.getRentId(), change_level);
+        	form.getClient().setPoints(clientAux.getPoints());
+        	form.getClient().setExperience(clientAux.getExperience());
+        	form.getClient().setLevel(clientAux.getLevel());
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has pasado al siguiente nivel: " + form.getClient().getLevel().getName());
+        }
+        
         form.getClient().setBalance(form.getClient().getBalance() + balance);
+        
+        String bonus = "0";        
+        if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
+        	form.getClient().setBonus(bonus);
+        	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
+        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	form.getClient().setPoints(clientAux.getPoints());
+        	form.getClient().setExperience(clientAux.getExperience());       
+        	form.getClient().setBalance(form.getClient().getBalance() + bonification);
+        	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
+        }
 
         System.out.println("salto extendido :: " + form.getClient().getBalance());
         double timeToExtend = TimerUtil.getTimeAsHours(form.getClient().getBalance(), form.getTariff());
@@ -214,8 +264,17 @@ public class PWLauncher extends JDialog implements ActionListener {
         timerUtil.extendTime(timeToExtend);
     }
 
+    private static double round(double value) {
+        long factor = (long) Math.pow(10, 2);
+        double factorValue = value * factor;
+        long tmp = Math.round(factorValue);
+        return (double) tmp / factor;
+    }
+    
     public static void main(String[] args) {
         new PWLauncher();
     }
+    
+    
 
 }

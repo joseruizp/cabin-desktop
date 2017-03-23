@@ -37,7 +37,7 @@ public class NotificationDialog extends JDialog {
         NotificationDialog.totalTime = totalTime;
         NotificationDialog.balance = balance;
         NotificationDialog.tariff = tariff;
-        setTitle("Notifiaciones");
+        setTitle("Notificaciones");
         setResizable(false);
         setBounds(100, 100, 728, 94);
         getContentPane().setLayout(new GridLayout(1, 0, 0, 0));

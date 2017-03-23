@@ -12,6 +12,15 @@ public class Level implements Serializable {
 	private Long id;
 	private Integer initialExperience;
 	private Integer finalExperience;
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public Integer getInitialExperience() {
 		return initialExperience;

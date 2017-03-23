@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
@@ -36,6 +38,7 @@ public class ViewDetailDialog extends JDialog {
     private JLabel pointsLabel;
     private JLabel balanceLabel;
     private JLabel experienceLabel;
+    private JLabel nivelLabel;
     private JTextField newPointsTextField;
 
     private JLabel balanceValueLabel;
@@ -49,7 +52,7 @@ public class ViewDetailDialog extends JDialog {
         final FailureRest failureRest = new FailureRest();
         final List<Failure> failures = failureRest.getFailures();
 
-        setBounds(100, 100, 489, 297);
+        setBounds(100, 100, 500, 297);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -92,38 +95,45 @@ public class ViewDetailDialog extends JDialog {
         experienceValueLabel.setBounds(434, 31, 37, 14);
         contentPanel.add(experienceValueLabel);
 
+        {
+            nivelLabel = new JLabel("Nivel:");
+            nivelLabel.setBounds(33, 82, 40, 14);
+            contentPanel.add(nivelLabel);
+        }
+        
+        final JLabel nivelValueLabel = new JLabel(String.valueOf(form.getClient().getLevel().getName()));
+        nivelValueLabel.setBounds(73, 82, 80, 14);
+        contentPanel.add(nivelValueLabel);
+        
         JLabel groupLabel = new JLabel("Grupo PC:");
-        groupLabel.setBounds(33, 82, 62, 14);
+        groupLabel.setBounds(163, 82, 67, 14);
         contentPanel.add(groupLabel);
 
         JLabel groupValueLabel = new JLabel(form.getComputer().getGroup().getName());
-        groupValueLabel.setBounds(93, 82, 117, 14);
+        groupValueLabel.setBounds(230, 82, 80, 14);
         contentPanel.add(groupValueLabel);
 
         JLabel tariffLabel = new JLabel("Tarifa:");
-        tariffLabel.setBounds(257, 82, 42, 14);
+        tariffLabel.setBounds(320, 82, 42, 14);
         contentPanel.add(tariffLabel);
 
         JLabel tariffValueLabel = new JLabel(PRICE_FORMAT.format(form.getTariff()));
-        tariffValueLabel.setBounds(297, 82, 32, 14);
+        tariffValueLabel.setBounds(362, 82, 18, 14);
         contentPanel.add(tariffValueLabel);
 
-        JLabel lblPorHora = new JLabel("por Hora");
-        lblPorHora.setBounds(335, 82, 52, 14);
+        JLabel lblPorHora = new JLabel("soles/hora");
+        lblPorHora.setBounds(380, 82, 60, 14);
         contentPanel.add(lblPorHora);
 
         JLabel lblPuntosACanjear = new JLabel("Puntos a Canjear:");
         lblPuntosACanjear.setBounds(33, 130, 107, 14);
         contentPanel.add(lblPuntosACanjear);
 
-        newPointsTextField = new JTextField();
-        newPointsTextField.setBounds(139, 127, 59, 20);
-        contentPanel.add(newPointsTextField);
-        newPointsTextField.setColumns(10);
 
         JLabel bonusLabel = new JLabel("Saldo a Obtener:");
         bonusLabel.setBounds(257, 130, 101, 14);
-        contentPanel.add(bonusLabel);
+        contentPanel.add(bonusLabel);        
+        
 
         final JLabel bonusValueLabel = new JLabel("");
         bonusValueLabel.setBounds(354, 130, 49, 14);
@@ -131,9 +141,48 @@ public class ViewDetailDialog extends JDialog {
 
         final JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(SystemColor.inactiveCaptionText);
-        messageLabel.setBounds(33, 201, 264, 14);
+        messageLabel.setBounds(33, 201, 300, 14);
         contentPanel.add(messageLabel);
 
+        
+        newPointsTextField = new JTextField();
+        newPointsTextField.setBounds(139, 127, 59, 20);
+        contentPanel.add(newPointsTextField);
+        newPointsTextField.setColumns(10);
+        newPointsTextField.getDocument().addDocumentListener(new DocumentListener() {
+        	public void changedUpdate(DocumentEvent e) {
+        		getBonus();
+        	}
+			public void removeUpdate(DocumentEvent e) {
+				getBonus();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				getBonus();
+			}
+			public void getBonus() {
+				int points = 0;
+				if ( !newPointsTextField.getText().isEmpty() )					
+					points = Integer.parseInt(newPointsTextField.getText());
+				else{
+					bonusValueLabel.setText("");
+				}
+                if ( points <= form.getClient().getPoints() ){
+                	if ( points > 0){
+                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+                		bonusValueLabel.setText(balance);
+                	}
+                	else{
+                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+                		bonusValueLabel.setText("");
+                	}                	
+                }
+                else{
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
+            		bonusValueLabel.setText("");
+                }
+			}
+        });
+        
         JLabel failureLabel = new JLabel("Tipo de Falla:");
         failureLabel.setBounds(33, 171, 90, 14);
         contentPanel.add(failureLabel);
@@ -164,29 +213,51 @@ public class ViewDetailDialog extends JDialog {
             }
         });
         buttonPane.add(btnReportarFalla);
-
+        
+        /*
         JButton viewBtn = new JButton("Ver Bono");
         buttonPane.add(viewBtn);
         viewBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int points = Integer.parseInt(newPointsTextField.getText());
-                String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
-                bonusValueLabel.setText(balance);
+                if ( points <= form.getClient().getPoints() ){
+                	if ( points > 0){
+                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+                		bonusValueLabel.setText(balance);
+                	}
+                	else{
+                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+                	}                	
+                }
+                else
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
             }
         });
-
+        */
+        
         JButton exchangeBtn = new JButton("Canjear");
         buttonPane.add(exchangeBtn);
         getRootPane().setDefaultButton(exchangeBtn);
         exchangeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Client client = new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
-                balanceValueLabel.setText(String.valueOf(client.getBalance()));
-                pointsValueLabel.setText(String.valueOf(client.getPoints()));
-                experienceValueLabel.setText(String.valueOf(client.getExperience()));
-                double hours = TimerUtil.getTimeAsHours(client.getBalance(), form.getTariff());
-                launcher.extendTime(hours);
-                messageLabel.setText("Canje de Puntos realizado satisfactoriamente.");
+            	Integer points = Integer.parseInt(newPointsTextField.getText());
+            	if ( points <= form.getClient().getPoints() ){
+            		if ( points > 0){
+		                Client client = new RentRest().exchangePoints(form.getRentId(), newPointsTextField.getText());
+		                balanceValueLabel.setText(String.valueOf(client.getBalance()));
+		                pointsValueLabel.setText(String.valueOf(client.getPoints()));
+		                experienceValueLabel.setText(String.valueOf(client.getExperience()));
+		                double hours = TimerUtil.getTimeAsHours(client.getBalance(), form.getTariff());
+		                launcher.extendTime(hours);
+		                messageLabel.setText("Canje de Puntos realizado satisfactoriamente.");
+		                newPointsTextField.setText("");
+		                bonusValueLabel.setText("");
+            		}
+            		else
+            			messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+            	}
+            	else
+            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
             }
         });
 
@@ -197,7 +268,7 @@ public class ViewDetailDialog extends JDialog {
                 Long minutesUsed = timerUtil.getMinutesUsed();
                 double hoursUsed = minutesUsed / 60.0;
                 double totalHours = round(hoursUsed);
-                double price = totalHours * form.getTariff();
+                double price = round(totalHours * form.getTariff());
                 new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
 
                 thisDialog.dispose();
