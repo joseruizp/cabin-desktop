@@ -87,6 +87,7 @@ public class NotificationDialog extends JDialog {
                 if (NotificationDialog.timerUtil != null) {
                     System.out.println("set timer notification: " + NotificationDialog.timerUtil.getRemainingTime());
                     NotificationDialog.balance = TimerUtil.getBalance(NotificationDialog.timerUtil.getRemainingTime(), NotificationDialog.tariff);
+                    availableTimeValueLabel.setText(NotificationDialog.timerUtil.getRemainingTime());
                     availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
                 }
             }

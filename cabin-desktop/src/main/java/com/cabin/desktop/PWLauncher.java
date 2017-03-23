@@ -179,7 +179,7 @@ public class PWLauncher extends JDialog implements ActionListener {
                     }
                     timerUtil.stop();
                     blockComputer();
-                } else if (viewDetailDialog != null && viewDetailDialog.isVisible()) {
+                } else if (viewDetailDialog != null) {
                     Double price = form.getClient().getBalance();
                     viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(price)));
                 }
