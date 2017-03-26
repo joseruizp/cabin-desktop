@@ -6,6 +6,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -189,8 +190,9 @@ public class PWLauncher extends JDialog implements ActionListener {
     public static void setTimer() {
         timerUtil.replaceActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("action listener launcher, " + timerUtil.getRemainingTime());
+                logger.info("action listener launcher, " + timerUtil.getRemainingTime());
                 form.updateBalance(timerUtil.getRemainingTime());
+                trayIcon.displayMessage("", timerUtil.getRemainingTime(), MessageType.NONE);
                 if (timerUtil.isShowNotification()) {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.setVisible(false);
