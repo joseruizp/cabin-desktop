@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -160,26 +161,44 @@ public class ViewDetailDialog extends JDialog {
 				getBonus();
 			}
 			public void getBonus() {
-				int points = 0;
-				if ( !newPointsTextField.getText().isEmpty() )					
-					points = Integer.parseInt(newPointsTextField.getText());
-				else{
-					bonusValueLabel.setText("");
-				}
-                if ( points <= form.getClient().getPoints() ){
-                	if ( points > 0){
-                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
-                		bonusValueLabel.setText(balance);
-                	}
-                	else{
-                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
-                		bonusValueLabel.setText("");
-                	}                	
-                }
-                else{
-            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
-            		bonusValueLabel.setText("");
-                }
+					Integer points = 0;
+					if ( !newPointsTextField.getText().isEmpty() ){	
+						points = Integer.parseInt(newPointsTextField.getText());
+						if ( points > form.getClient().getPoints() ){
+							points = form.getClient().getPoints();
+							//newPointsTextField.setText(Integer.toString(points));
+							SwingUtilities.invokeLater( new ChangeTextFieldPoints(points));
+						}
+					}
+					else{
+						bonusValueLabel.setText("");
+					}
+	                if ( points <= form.getClient().getPoints() ){
+	                	if ( points > 0){
+	                		String balance = new PrizesRuleRest().getBonification(form.getClient().getLevel().getId(), points);
+	                		messageLabel.setText("");
+	                		bonusValueLabel.setText(balance);	                		
+	                	}
+	                	else{
+	                		messageLabel.setText("Debe colocar un valor de puntos mayor a 0.");
+	                		bonusValueLabel.setText("");
+	                	}                	
+	                }
+	                else{
+	            		messageLabel.setText("Los puntos a canjear exceden a los puntos que usted tiene.");
+	            		bonusValueLabel.setText("");
+	                }
+			}
+			class ChangeTextFieldPoints implements Runnable {			    
+			    private int points;
+	
+			    ChangeTextFieldPoints(int points) {
+			      this.points = points;			      
+			    }
+	
+			    public void run() {			    
+			    	newPointsTextField.setText(Integer.toString(points));
+			    }
 			}
         });
         
