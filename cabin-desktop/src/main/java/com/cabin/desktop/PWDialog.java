@@ -32,6 +32,7 @@ import org.glassfish.tyrus.server.Server;
 
 import com.cabin.common.PropertiesLoader;
 import com.cabin.common.TimerUtil;
+import com.cabin.common.exception.UserAlreadyActiveException;
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
 import com.cabin.entity.FormInformation;
@@ -253,19 +254,24 @@ public class PWDialog extends JDialog implements ActionListener {
         String password = pwField.getText();
 
         LoginRest loginRest = new LoginRest();
-        Client client = loginRest.login(email, password);
+        try {
+			Client client = loginRest.login(email, password);
 
-        if (client != null) {
-            System.out.println("loggin successfull");
-            if (client.getBalance() == 0) {
-                noBalance();
-            } else {
-                accept(client);
-            }
-        } else {
-            System.out.println("login failed");
-            deny();
-        }
+			if (client != null) {
+			    System.out.println("loggin successfull");
+			    if (client.getBalance() == 0) {
+			        noBalance();
+			    } else {
+			        accept(client);
+			    }
+			} else {
+			    System.out.println("login failed");
+			    deny();
+			}
+		} catch (UserAlreadyActiveException ex) {
+			System.out.println("user already active");
+			deny();
+		}
     }
 
     public static void main(String[] args) throws AWTException {

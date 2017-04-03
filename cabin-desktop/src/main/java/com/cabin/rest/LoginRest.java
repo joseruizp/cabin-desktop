@@ -3,9 +3,9 @@ package com.cabin.rest;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.cabin.common.exception.UserAlreadyActiveException;
 import com.cabin.entity.User;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -51,6 +51,10 @@ public class LoginRest extends BaseRest {
         }
 
         String output = response.getEntity(String.class);
+        if ("ACCESS_DENIED".equals(output)) {
+        	logger.error(output + " for email: " + email);
+        	throw new UserAlreadyActiveException(output);
+        }
 
         logger.info("output login: " + output);
 
