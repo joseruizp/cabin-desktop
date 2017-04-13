@@ -171,9 +171,12 @@ public class PWLauncher extends JDialog implements ActionListener {
         }
         String bonus = "0";        
         if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
-        	PWLauncher.form.getClient().setBonus(bonus);
+        	PWLauncher.form.getClient().setBonus(bonus);        	
+        	Long bonusIdBeforeChange = (long) 0 ;
+			if ( form.getClient().getId_bonification() != null) 
+				bonusIdBeforeChange = form.getClient().getId_bonification();
         	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
-        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	Double bonification = new ClientRest().getBonification(bonusIdBeforeChange, clientAux.getId_bonification());
         	PWLauncher.form.getClient().setBalance(form.getClient().getBalance() + bonification);
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
         }
@@ -251,9 +254,12 @@ public class PWLauncher extends JDialog implements ActionListener {
         
         String bonus = "0";        
         if ( Integer.parseInt(form.getClient().getBonus()) == 1 ){
-        	form.getClient().setBonus(bonus);
+        	form.getClient().setBonus(bonus);        	
+        	Long bonusIdBeforeChange = (long) 0;
+        	if ( form.getClient().getId_bonification() != null) 
+				bonusIdBeforeChange = form.getClient().getId_bonification();
         	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
-        	Double bonification = new ClientRest().getBonification(clientAux.getId_bonification());
+        	Double bonification = new ClientRest().getBonification(bonusIdBeforeChange, clientAux.getId_bonification());
         	form.getClient().setPoints(clientAux.getPoints());
         	form.getClient().setExperience(clientAux.getExperience());       
         	form.getClient().setBalance(form.getClient().getBalance() + bonification);

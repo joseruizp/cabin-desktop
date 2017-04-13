@@ -80,7 +80,7 @@ public class ClientRest extends BaseRest {
         
     }
     
-    public Double getBonification(Long bonusId) {
+    public Double getBonification(Long bonusIdPreview, Long bonusId) {
     	ClientConfig clientConfig = new DefaultClientConfig();
 
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -88,7 +88,8 @@ public class ClientRest extends BaseRest {
         Client client = Client.create(clientConfig);
 
         String uri = getHost() + "/get/bonification";
-        uri += "?bonus_id=" + bonusId;
+        uri += "?bonus_id_preview=" + bonusIdPreview;
+        uri += "&bonus_id=" + bonusId;
         
         System.out.println("URL: " + uri);
         
