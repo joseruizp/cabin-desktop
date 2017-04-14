@@ -208,8 +208,8 @@ public class PWLauncher extends JDialog implements ActionListener {
                     Long minutesUsed = timerUtil.getMinutesUsed();
                     double hoursUsed = minutesUsed / 60.0;
                     double totalHours = round(hoursUsed);
-                    double price = totalHours * form.getTariff();
-                    new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+                    //double price = totalHours * form.getTariff();
+                    new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(form.getTariff()));
 
                     instance.stopComputer();
                 } else if (viewDetailDialog != null) {

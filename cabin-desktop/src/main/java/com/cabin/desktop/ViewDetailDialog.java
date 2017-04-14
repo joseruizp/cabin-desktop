@@ -287,8 +287,8 @@ public class ViewDetailDialog extends JDialog {
                 Long minutesUsed = timerUtil.getMinutesUsed();
                 double hoursUsed = minutesUsed / 60.0;
                 double totalHours = round(hoursUsed);
-                double price = round(totalHours * form.getTariff());
-                new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(price));
+                //double price = round(totalHours * form.getTariff());
+                new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(form.getTariff()));
 
                 thisDialog.dispose();
                 launcher.stopComputer();
