@@ -7,9 +7,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.cabin.desktop.PWLauncher;
+
 public class InternetConnectionValidator {
 
-	public static void checkConnection(int maximunAttempsInMinutes) {
+	public static void checkConnection() {
+		Long maximunAttempsInMinutes = PWLauncher.connectionData.get(Parameter.MAXIMUM_DISCONNECTION_TIME);
 		System.out.println(Thread.currentThread().getId() + " in check connection: " + maximunAttempsInMinutes);
 
 		AtomicInteger attemptsInMinutes = new AtomicInteger(0);

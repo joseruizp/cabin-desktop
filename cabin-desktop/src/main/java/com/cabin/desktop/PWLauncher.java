@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -20,11 +21,13 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import com.cabin.common.ConnectionDataValidator;
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
 import com.cabin.entity.FormInformation;
 import com.cabin.rest.ClientRest;
+import com.cabin.rest.ParameterRest;
 import com.cabin.rest.RentRest;
 
 public class PWLauncher extends JDialog implements ActionListener {
@@ -43,6 +46,8 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static PWLauncher instance;
 
     private static ViewDetailDialog viewDetailDialog;
+    
+    public static Map<Long, Long> connectionData;
 
     public PWLauncher() {
     	logger.info("starting app");
@@ -59,6 +64,8 @@ public class PWLauncher extends JDialog implements ActionListener {
 
         setFocusable(true);
         setVisible(true);
+        connectionData = new ParameterRest().getConnectionData();
+        logger.info("Connecion data: " + connectionData);
         instance = this;
         viewDetailDialog = null;
     }
@@ -152,6 +159,7 @@ public class PWLauncher extends JDialog implements ActionListener {
             timerUtil = null;
             viewDetailDialog = null;
             PWDialog.disposeInstance();
+            ConnectionDataValidator.checkDataConnection();
             PWDialog.main(null);
         } catch (AWTException e) {
             e.printStackTrace();

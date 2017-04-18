@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.glassfish.tyrus.server.Server;
 
 import com.cabin.common.InternetConnectionValidator;
+import com.cabin.common.Parameter;
 import com.cabin.common.PropertiesLoader;
 import com.cabin.common.TimerUtil;
 import com.cabin.common.exception.UserAlreadyActiveException;
@@ -180,7 +181,7 @@ public class PWDialog extends JDialog implements ActionListener {
 
 		startWebSocket();
 		System.out.println(Thread.currentThread().getId() + " before check connection");
-		InternetConnectionValidator.checkConnection(5);
+		InternetConnectionValidator.checkConnection();
 		System.out.println(Thread.currentThread().getId() + " after check connection");
 
 		final Dialog thisDialog = this;
