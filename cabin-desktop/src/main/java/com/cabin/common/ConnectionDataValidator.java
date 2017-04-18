@@ -8,9 +8,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
 import com.cabin.desktop.PWLauncher;
 
 public class ConnectionDataValidator {
+	
+	final static Logger logger = Logger.getLogger(ConnectionDataValidator.class);
 	
 	private static final List<String> PROGRAMS_TO_KILL = Arrays.asList("chrome.exe", "iexplorer.exe", "dota.exe", "excel.exe", 
 			"winword.exe", "powerpnt.exe");
@@ -18,20 +22,20 @@ public class ConnectionDataValidator {
 	public static void checkDataConnection() {
 		Long maximumBlockTimeToClosePrograms = PWLauncher.connectionData.get(Parameter.MAXIMUM_BLOCKED_TIME_TO_CLOSE_PROGRAMS);
 		Long maximumBlockTimeToShutDown = PWLauncher.connectionData.get(Parameter.MAXIMUM_BLOCKED_TIME_TO_SHUT_DOWN);
-		System.out.println(Thread.currentThread().getId() + " in check connection, maximumBlockTimeToClosePrograms: " + maximumBlockTimeToClosePrograms);
-		System.out.println(Thread.currentThread().getId() + " in check connection, maximumBlockTimeToShutDown: " + maximumBlockTimeToShutDown);
+		logger.debug(Thread.currentThread().getId() + " in check connection, maximumBlockTimeToClosePrograms: " + maximumBlockTimeToClosePrograms);
+		logger.debug(Thread.currentThread().getId() + " in check connection, maximumBlockTimeToShutDown: " + maximumBlockTimeToShutDown);
 
 		AtomicInteger attemptsInMinutes = new AtomicInteger(0);
 		ScheduledExecutorService schExService = Executors.newScheduledThreadPool(1);
 		schExService.scheduleAtFixedRate(() -> {
-			System.out.println(Thread.currentThread().getId() + " in attemp: " + attemptsInMinutes.get());
+			logger.debug(Thread.currentThread().getId() + " in attemp: " + attemptsInMinutes.get());
 			attemptsInMinutes.incrementAndGet();
 			if (attemptsInMinutes.get() == maximumBlockTimeToClosePrograms) {
-				System.out.println(Thread.currentThread().getId() + " closing programs");
+				logger.info(Thread.currentThread().getId() + " closing programs");
 				closePrograms();
 			}
 			if (attemptsInMinutes.get() == maximumBlockTimeToShutDown) {
-				System.out.println(Thread.currentThread().getId() + " shutting down");
+				logger.debug(Thread.currentThread().getId() + " shutting down");
 				schExService.shutdown();
 				shutdownComputer();
 			}
@@ -42,9 +46,10 @@ public class ConnectionDataValidator {
 	private static void closePrograms() {
 		PROGRAMS_TO_KILL.forEach(p -> {
 			try {
+				logger.info("killing " + p);
 				Runtime.getRuntime().exec("TASKKILL /F /IM " + p);
 			} catch (IOException e) {
-				System.out.println("couldn't kill " + p);
+				logger.error("couldn't kill " + p);
 				e.printStackTrace();
 			}
 		});
