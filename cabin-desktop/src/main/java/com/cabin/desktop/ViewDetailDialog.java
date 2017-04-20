@@ -5,8 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
 import com.cabin.entity.Failure;
@@ -33,7 +36,7 @@ public class ViewDetailDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private static final NumberFormat PRICE_FORMAT = NumberFormat.getNumberInstance(Locale.US);
-
+    
     private final JPanel contentPanel = new JPanel();
     private JLabel userLabel;
     private JLabel pointsLabel;
@@ -43,7 +46,9 @@ public class ViewDetailDialog extends JDialog {
     private JTextField newPointsTextField;
 
     private JLabel balanceValueLabel;
-
+    
+    private static JLabel availableTimeValueLabel;
+    
     /**
      * Create the dialog.
      */
@@ -215,6 +220,14 @@ public class ViewDetailDialog extends JDialog {
         }
 
         contentPanel.add(failureCombo);
+        
+        JLabel availableTimeLabel = new JLabel("Tiempo Disponible:");
+        availableTimeLabel.setBounds(257, 171, 99, 14);
+        contentPanel.add(availableTimeLabel);
+        
+        availableTimeValueLabel = new JLabel(timerUtil.getRemainingTime());
+        availableTimeValueLabel.setBounds(362, 171, 68, 14);
+        contentPanel.add(availableTimeValueLabel);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -305,7 +318,7 @@ public class ViewDetailDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setVisible(true);
     }
-
+    
     public JLabel getBalanceValueLabel() {
         return this.balanceValueLabel;
     }

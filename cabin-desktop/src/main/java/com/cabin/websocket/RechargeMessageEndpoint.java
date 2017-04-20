@@ -24,11 +24,8 @@ public class RechargeMessageEndpoint {
     public void onMessage(String message) {
         System.out.println("onMessage: " + message);
         this.message = message;
-        if (NotificationDialog.isDialogVisible()) {
-            NotificationDialog.updateBalance(Double.parseDouble(message));
-        } else {
-            PWLauncher.updateBalance(Double.parseDouble(message));
-        }
+        NotificationDialog.updateBalance(Double.parseDouble(message));
+        PWLauncher.updateBalance(Double.parseDouble(message));
     }
 
     public String getMessage() {
