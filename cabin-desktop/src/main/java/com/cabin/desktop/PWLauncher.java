@@ -185,9 +185,7 @@ public class PWLauncher extends JDialog implements ActionListener {
 				bonusIdBeforeChange = form.getClient().getId_bonification();
         	Client clientAux = new ClientRest().changeBonification(form.getRentId(), bonus);
         	Double bonification = new ClientRest().getBonification(bonusIdBeforeChange, clientAux.getId_bonification());
-        	PWLauncher.form.getClient().setBalance(form.getClient().getBalance() + bonification);
-        	Double clientPrice = PWLauncher.form.getClient().getBalance();
-        	viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(clientPrice)));
+        	PWLauncher.form.getClient().setBalance(form.getClient().getBalance() + bonification);        	
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
         }
         
@@ -272,9 +270,7 @@ public class PWLauncher extends JDialog implements ActionListener {
         	Double bonification = new ClientRest().getBonification(bonusIdBeforeChange, clientAux.getId_bonification());
         	form.getClient().setPoints(clientAux.getPoints());
         	form.getClient().setExperience(clientAux.getExperience());       
-        	form.getClient().setBalance(form.getClient().getBalance() + bonification);
-        	Double clientPrice = form.getClient().getBalance();
-        	viewDetailDialog.getBalanceValueLabel().setText(String.valueOf(PriceUtil.round(clientPrice)));
+        	form.getClient().setBalance(form.getClient().getBalance() + bonification);        	
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
         }
 
