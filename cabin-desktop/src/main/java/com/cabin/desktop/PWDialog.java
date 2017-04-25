@@ -31,13 +31,14 @@ import org.apache.log4j.Logger;
 import org.glassfish.tyrus.server.Server;
 
 import com.cabin.common.InternetConnectionValidator;
-import com.cabin.common.Parameter;
 import com.cabin.common.PropertiesLoader;
 import com.cabin.common.TimerUtil;
 import com.cabin.common.exception.UserAlreadyActiveException;
 import com.cabin.entity.Client;
 import com.cabin.entity.Computer;
 import com.cabin.entity.FormInformation;
+import com.cabin.entity.NextBonus;
+import com.cabin.rest.ClientRest;
 import com.cabin.rest.ComputerRest;
 import com.cabin.rest.LoginRest;
 import com.cabin.rest.RentRest;
@@ -193,8 +194,9 @@ public class PWDialog extends JDialog implements ActionListener {
 			public void run() {
 				double rentTime = TimerUtil.getTimeAsHours(client.getBalance(), tariff);
 				Long rentId = new RentRest().startRentComputer(client.getId(), computer.getId());
+				NextBonus nextBonus = new ClientRest().getNextBonus(client.getId());
 				thisDialog.dispose();
-				PWLauncher.showNotification(new FormInformation(rentId, client, computer, tariff), rentTime);
+				PWLauncher.showNotification(new FormInformation(rentId, client, computer, tariff, nextBonus), rentTime);
 				security.stop();
 			}
 		}, 900L);

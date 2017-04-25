@@ -2,15 +2,15 @@ package com.cabin.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,7 +20,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 import com.cabin.entity.Client;
 import com.cabin.entity.Failure;
@@ -28,14 +27,14 @@ import com.cabin.entity.FormInformation;
 import com.cabin.rest.FailureRest;
 import com.cabin.rest.PrizesRuleRest;
 import com.cabin.rest.RentRest;
-import java.awt.SystemColor;
-import javax.swing.JComboBox;
 
 public class ViewDetailDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
     private static final NumberFormat PRICE_FORMAT = NumberFormat.getNumberInstance(Locale.US);
+    
+    private static final String BONUS_MESSAGE = "Próxima bonificación de %s soles al llegar a los %s de experiencia";
     
     private final JPanel contentPanel = new JPanel();
     private JLabel userLabel;
@@ -58,7 +57,7 @@ public class ViewDetailDialog extends JDialog {
         final FailureRest failureRest = new FailureRest();
         final List<Failure> failures = failureRest.getFailures();
 
-        setBounds(100, 100, 500, 297);
+        setBounds(100, 100, 500, 319);
         BorderLayout borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -228,6 +227,12 @@ public class ViewDetailDialog extends JDialog {
         availableTimeValueLabel = new JLabel(timerUtil.getRemainingTime());
         availableTimeValueLabel.setBounds(362, 171, 68, 14);
         contentPanel.add(availableTimeValueLabel);
+        
+		String bonusMessage = form.getNextBonus() == null ? ""
+				: String.format(BONUS_MESSAGE, form.getNextBonus().getAmount(), form.getNextBonus().getExperience());
+		JLabel bonusMessageLabel = new JLabel(bonusMessage);
+        bonusMessageLabel.setBounds(33, 57, 422, 14);
+        contentPanel.add(bonusMessageLabel);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));

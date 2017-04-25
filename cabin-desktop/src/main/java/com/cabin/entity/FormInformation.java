@@ -8,13 +8,15 @@ public class FormInformation {
     private Computer computer;
     private Double tariff;
     private Long rentId;
+    private NextBonus nextBonus;
 
-    public FormInformation(Long rentId, Client client, Computer computer, Double tariff) {
+    public FormInformation(Long rentId, Client client, Computer computer, Double tariff, NextBonus nextBonus) {
         super();
         this.rentId = rentId;
         this.client = client;
         this.computer = computer;
         this.tariff = tariff;
+        this.nextBonus = nextBonus;
     }
 
     public Long getRentId() {
@@ -32,6 +34,10 @@ public class FormInformation {
     public Double getTariff() {
         return tariff;
     }
+    
+    public NextBonus getNextBonus() {
+		return nextBonus;
+	}
 
     public void updateBalance(String remainingTime) {
         this.client.setBalance(TimerUtil.getBalance(remainingTime, tariff));

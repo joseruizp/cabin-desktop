@@ -1,7 +1,10 @@
 package com.cabin.rest;
 
+import java.util.Map;
+
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.cabin.entity.NextBonus;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -107,6 +110,43 @@ public class ClientRest extends BaseRest {
         
         return Double.parseDouble(output);
     }
+
+	public NextBonus getNextBonus(Long id) {
+		ClientConfig clientConfig = new DefaultClientConfig();
+
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+
+        Client client = Client.create(clientConfig);
+
+        String uri = getHost() + "/get/nextBonification";
+        uri += "?client_id=" + id;
+        
+        System.out.println("URL: " + uri);
+        
+        WebResource webResource = client.resource(uri);
+        ClientResponse response = webResource.accept("application/json").type("application/json").get(ClientResponse.class);
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+        }
+
+        String output = response.getEntity(String.class);
+
+        System.out.println("Server response .... \n");
+        System.out.println("output update change level: " + output);
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<Integer, Double> result = mapper.readValue(output, mapper.getTypeFactory().constructMapType(Map.class, Integer.class, Double.class));
+            if (result == null || result.isEmpty()) {
+            	return null;
+            }
+            return new NextBonus(result.entrySet().iterator().next().getKey(), result.entrySet().iterator().next().getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+	}
 
 
 }
