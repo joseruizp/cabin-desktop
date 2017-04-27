@@ -24,7 +24,7 @@ public class RechargeMessageEndpoint {
     public void onMessage(String message) {
         System.out.println("onMessage: " + message);
         this.message = message;
-        NotificationDialog.updateBalance(Double.parseDouble(message));
+        NotificationDialog.extendTime(Double.parseDouble(message));
         PWLauncher.updateBalance(Double.parseDouble(message));
     }
 

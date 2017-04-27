@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import org.apache.log4j.Logger;
 import org.glassfish.tyrus.server.Server;
 
+import com.cabin.common.ConnectionDataValidator;
 import com.cabin.common.InternetConnectionValidator;
 import com.cabin.common.PropertiesLoader;
 import com.cabin.common.TimerUtil;
@@ -184,6 +185,7 @@ public class PWDialog extends JDialog implements ActionListener {
 		System.out.println(Thread.currentThread().getId() + " before check connection");
 		InternetConnectionValidator.checkConnection();
 		System.out.println(Thread.currentThread().getId() + " after check connection");
+		ConnectionDataValidator.showdownThreads();
 
 		final Dialog thisDialog = this;
 		final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));

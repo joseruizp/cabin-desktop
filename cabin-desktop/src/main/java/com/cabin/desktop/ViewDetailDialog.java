@@ -229,7 +229,7 @@ public class ViewDetailDialog extends JDialog {
         contentPanel.add(availableTimeValueLabel);
         
 		String bonusMessage = form.getNextBonus() == null ? ""
-				: String.format(BONUS_MESSAGE, form.getNextBonus().getAmount(), form.getNextBonus().getExperience());
+				: String.format(BONUS_MESSAGE, form.getNextBonus().getExperience(), form.getNextBonus().getAmount());
 		JLabel bonusMessageLabel = new JLabel(bonusMessage);
         bonusMessageLabel.setBounds(33, 57, 422, 14);
         contentPanel.add(bonusMessageLabel);

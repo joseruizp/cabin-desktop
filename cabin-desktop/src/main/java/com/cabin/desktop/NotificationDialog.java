@@ -73,12 +73,8 @@ public class NotificationDialog extends JDialog {
     }
 
     private void cleanStaticVariable() {
-        availableTimeValueLabel = null;
-        availableBalanceValueLabel = null;
         totalTime = null;
         balance = null;
-        tariff = null;
-        instance = null;
     }
 
     private void setTimer(String totalTime) {
@@ -100,8 +96,16 @@ public class NotificationDialog extends JDialog {
         }
         return instance.isVisible();
     }
+    
+    public void refresh(String totalTime, Double balance) {
+    	NotificationDialog.totalTime = totalTime;
+    	NotificationDialog.balance = balance;
+    	availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(balance)));
+    	availableTimeValueLabel.setText(totalTime);
+    	this.setVisible(true);
+    }
 
-    public static void updateBalance(Double balance) {
+    public static void extendTime(Double balance) {
         NotificationDialog.balance += balance;
         availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
 

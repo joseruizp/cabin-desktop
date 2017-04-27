@@ -18,6 +18,8 @@ public class ConnectionDataValidator {
 	
 	private static final List<String> PROGRAMS_TO_KILL = Arrays.asList("chrome.exe", "iexplorer.exe", "dota.exe", "excel.exe", 
 			"winword.exe", "powerpnt.exe");
+	
+	private static ScheduledExecutorService schExService;
 
 	public static void checkDataConnection() {
 		Long maximumBlockTimeToClosePrograms = PWLauncher.connectionData.get(Parameter.MAXIMUM_BLOCKED_TIME_TO_CLOSE_PROGRAMS);
@@ -26,7 +28,7 @@ public class ConnectionDataValidator {
 		logger.debug(Thread.currentThread().getId() + " in check connection, maximumBlockTimeToShutDown: " + maximumBlockTimeToShutDown);
 
 		AtomicInteger attemptsInMinutes = new AtomicInteger(0);
-		ScheduledExecutorService schExService = Executors.newScheduledThreadPool(1);
+		schExService = Executors.newScheduledThreadPool(1);
 		schExService.scheduleAtFixedRate(() -> {
 			logger.debug(Thread.currentThread().getId() + " in attemp: " + attemptsInMinutes.get());
 			attemptsInMinutes.incrementAndGet();
@@ -41,6 +43,12 @@ public class ConnectionDataValidator {
 			}
 		}, 0, 1, TimeUnit.MINUTES);
 
+	}
+	
+	public static void showdownThreads() {
+		if (schExService != null) {
+			schExService.shutdown();
+		}
 	}
 	
 	private static void closePrograms() {

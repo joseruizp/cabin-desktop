@@ -46,6 +46,7 @@ public class PWLauncher extends JDialog implements ActionListener {
     private static PWLauncher instance;
 
     private static ViewDetailDialog viewDetailDialog;
+    private static NotificationDialog notificationDialog;
     
     public static Map<Long, Long> connectionData;
 
@@ -189,13 +190,15 @@ public class PWLauncher extends JDialog implements ActionListener {
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
         }
         
-        new NotificationDialog(TimerUtil.getHoursAsString(totalTime), PWLauncher.form.getClient().getBalance(), PWLauncher.form.getTariff());
+        notificationDialog = new NotificationDialog(TimerUtil.getHoursAsString(totalTime), PWLauncher.form.getClient().getBalance(), PWLauncher.form.getTariff());
     }
 
-    private static void updateNotificationDialog(String totalTime) {
+    private static void updateNotificationDialog() {
         SystemTray tray = SystemTray.getSystemTray();
-        tray.remove(trayIcon);        
-        new NotificationDialog(totalTime, form.getClient().getBalance(), form.getTariff());
+        tray.remove(trayIcon);
+        String remainingTime = timerUtil.getRemainingTime();
+        double balance = TimerUtil.getBalance(remainingTime, form.getTariff());
+        notificationDialog.refresh(remainingTime, balance);
     }
 
     public static void setTimer() {
@@ -208,7 +211,7 @@ public class PWLauncher extends JDialog implements ActionListener {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.setVisible(false);
                     }
-                    updateNotificationDialog(timerUtil.getRemainingTime());
+                    updateNotificationDialog();
                 } else if (timerUtil.isOver()) {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.dispose();

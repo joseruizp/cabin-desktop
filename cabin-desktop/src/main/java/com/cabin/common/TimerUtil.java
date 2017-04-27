@@ -83,7 +83,7 @@ public class TimerUtil {
     }
 
     public boolean isShowNotification() {
-        return false;//(totalMinutes == 10 || totalMinutes == 5 || totalMinutes == 3);
+        return (totalMinutes == 10 || totalMinutes == 5);
     }
 
     public boolean isOver() {
