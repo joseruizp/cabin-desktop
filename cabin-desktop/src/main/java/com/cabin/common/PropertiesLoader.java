@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class PropertiesLoader {
 	
-	private static final String DEFAULT_PATH = "C:/cabinas/";
+	public static final String DEFAULT_PATH = "C:/cabinas/";
 	private Properties prop;
 
 	public PropertiesLoader(String file) {

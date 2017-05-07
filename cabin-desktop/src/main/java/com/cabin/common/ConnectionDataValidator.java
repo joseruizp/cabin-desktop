@@ -45,7 +45,7 @@ public class ConnectionDataValidator {
 
 	}
 	
-	public static void showdownThreads() {
+	public static void shutdownThreads() {
 		if (schExService != null) {
 			schExService.shutdown();
 		}

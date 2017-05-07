@@ -302,9 +302,7 @@ public class ViewDetailDialog extends JDialog {
         buttonPane.add(stopBtn);
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Long minutesUsed = timerUtil.getMinutesUsed();
-                double hoursUsed = minutesUsed / 60.0;
-                double totalHours = round(hoursUsed);
+                double totalHours = timerUtil.getTotalHoursUsed();
                 //double price = round(totalHours * form.getTariff());
                 new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(form.getTariff()));
 

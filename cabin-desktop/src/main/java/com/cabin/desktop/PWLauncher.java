@@ -41,7 +41,7 @@ public class PWLauncher extends JDialog implements ActionListener {
 
     private static boolean isLoggedIn;
     private static FormInformation form;
-    private static TimerUtil timerUtil;
+    public static TimerUtil timerUtil;
 
     private static PWLauncher instance;
 
@@ -216,9 +216,7 @@ public class PWLauncher extends JDialog implements ActionListener {
                     if (viewDetailDialog != null) {
                         viewDetailDialog.dispose();
                     }                    
-                    Long minutesUsed = timerUtil.getMinutesUsed();
-                    double hoursUsed = minutesUsed / 60.0;
-                    double totalHours = round(hoursUsed);
+                    double totalHours = timerUtil.getTotalHoursUsed();
                     //double price = totalHours * form.getTariff();
                     new RentRest().endRentComputer(form.getRentId(), String.valueOf(totalHours), String.valueOf(form.getTariff()));
 
@@ -277,9 +275,9 @@ public class PWLauncher extends JDialog implements ActionListener {
         	JOptionPane.showMessageDialog(parent, "Felicitaciones has recibido una bonificación de: " + bonification + " soles");
         }
 
-        System.out.println("salto extendido :: " + form.getClient().getBalance());
+        logger.debug("salto extendido :: " + form.getClient().getBalance());
         double timeToExtend = TimerUtil.getTimeAsHours(form.getClient().getBalance(), form.getTariff());
-        System.out.println("tiempo extendido :: " + timeToExtend);
+        logger.debug("tiempo extendido :: " + timeToExtend);
         timerUtil.extendTime(timeToExtend);
     }
 

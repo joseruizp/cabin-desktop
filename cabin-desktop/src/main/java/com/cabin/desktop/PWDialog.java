@@ -182,21 +182,24 @@ public class PWDialog extends JDialog implements ActionListener {
 		showPanel("Card with Images");
 
 		startWebSocket();
-		System.out.println(Thread.currentThread().getId() + " before check connection");
-		InternetConnectionValidator.checkConnection();
-		System.out.println(Thread.currentThread().getId() + " after check connection");
-		ConnectionDataValidator.showdownThreads();
+		ConnectionDataValidator.shutdownThreads();
 
 		final Dialog thisDialog = this;
 		final Computer computer = new ComputerRest().getComputer(propertiesLoader.getLong("id_equipo"));
 		final Long headquarterId = propertiesLoader.getLong("id_sede");
 		final Double tariff = new TariffRest().getTariff(computer.getGroup().getId(), headquarterId);
+		
 		Timer t = new Timer();
 		t.schedule(new TimerTask() {
 			public void run() {
 				double rentTime = TimerUtil.getTimeAsHours(client.getBalance(), tariff);
 				Long rentId = new RentRest().startRentComputer(client.getId(), computer.getId());
 				NextBonus nextBonus = new ClientRest().getNextBonus(client.getId());
+				
+				System.out.println(Thread.currentThread().getId() + " before check connection");
+				InternetConnectionValidator.checkConnection(rentId, PWLauncher.timerUtil, tariff);
+				System.out.println(Thread.currentThread().getId() + " after check connection");
+				
 				thisDialog.dispose();
 				PWLauncher.showNotification(new FormInformation(rentId, client, computer, tariff, nextBonus), rentTime);
 				security.stop();

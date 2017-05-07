@@ -11,12 +11,16 @@ import java.util.TimeZone;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
+import org.apache.log4j.Logger;
+
 import com.cabin.common.PriceUtil;
 import com.cabin.common.TimerUtil;
 
 public class NotificationDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    
+    final static Logger logger = Logger.getLogger(NotificationDialog.class);
 
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     {
@@ -61,7 +65,6 @@ public class NotificationDialog extends JDialog {
             public void windowClosed(WindowEvent e) {
                 System.out.println("closing notification");
                 // new PWLauncher(timerUtil, formInformation);
-                cleanStaticVariable();
                 PWLauncher.setDialogVisible(timerUtil);
                 thisDialog.dispose();
             }
@@ -70,11 +73,6 @@ public class NotificationDialog extends JDialog {
         this.setVisible(true);
 
         instance = this;
-    }
-
-    private void cleanStaticVariable() {
-        totalTime = null;
-        balance = null;
     }
 
     private void setTimer(String totalTime) {
@@ -109,9 +107,9 @@ public class NotificationDialog extends JDialog {
         NotificationDialog.balance += balance;
         availableBalanceValueLabel.setText(String.valueOf(PriceUtil.round(NotificationDialog.balance)));
 
-        System.out.println("salto extendido :: " + NotificationDialog.balance);
+        logger.debug("salto extendido :: " + NotificationDialog.balance);
         double timeToExtend = TimerUtil.getTimeAsHours(NotificationDialog.balance, NotificationDialog.tariff);
-        System.out.println("tiempo extendido :: " + timeToExtend);
+        logger.debug("tiempo extendido :: " + timeToExtend);
         NotificationDialog.timerUtil.extendTime(timeToExtend);
 
         double totalTime = TimerUtil.getHours(NotificationDialog.totalTime);

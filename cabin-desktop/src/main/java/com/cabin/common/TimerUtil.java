@@ -77,6 +77,17 @@ public class TimerUtil {
     public Long getMinutesUsed() {
         return minutesUsed;
     }
+    
+    public double getTotalHoursUsed() {
+    	Long minutesUsed = this.getMinutesUsed();
+        double hoursUsed = minutesUsed / 60.0;
+        return round(hoursUsed);
+    }
+    
+    public static double getMinutesAsHours(Long minutes) {
+    	double hoursUsed = minutes / 60.0;
+        return round(hoursUsed);
+    }
 
     public void stop() {
         timer.stop();
