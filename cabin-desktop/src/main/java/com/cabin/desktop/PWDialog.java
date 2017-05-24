@@ -69,7 +69,7 @@ public class PWDialog extends JDialog implements ActionListener {
 	private PropertiesLoader propertiesLoader;
 	private static final String PROPERTIES_FILE_NAME = "datos.properties";
 	private static Server server;
-
+	
 	public PWDialog() {
 		accepting = false;
 		denying = false;
@@ -197,7 +197,7 @@ public class PWDialog extends JDialog implements ActionListener {
 				NextBonus nextBonus = new ClientRest().getNextBonus(client.getId());
 				
 				System.out.println(Thread.currentThread().getId() + " before check connection");
-				InternetConnectionValidator.checkConnection(rentId, PWLauncher.timerUtil, tariff);
+				InternetConnectionValidator.checkConnection(rentId, tariff);
 				System.out.println(Thread.currentThread().getId() + " after check connection");
 				
 				thisDialog.dispose();

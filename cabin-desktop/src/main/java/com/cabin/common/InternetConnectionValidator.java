@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.cabin.desktop.NotificationDialog;
@@ -25,35 +26,51 @@ public class InternetConnectionValidator {
 	private static final String FILE_SEPARATOR = "|";
 	private static final String NO_CONNECTION_FILE = "noConnection.txt";
 	
-	public static void checkConnection(Long clientId, TimerUtil timerUtil, double tariff) {
+	public static void checkConnection(final Long rentId, final double tariff) {
 		Long maximunAttempsInMinutes = PWLauncher.connectionData.get(Parameter.MAXIMUM_DISCONNECTION_TIME);
 		logger.debug(Thread.currentThread().getId() + " in check connection: " + maximunAttempsInMinutes);
 
-		AtomicInteger attemptsInMinutes = new AtomicInteger(0);
+		AtomicInteger minutesDisconnected = new AtomicInteger(0);
+		AtomicInteger minutesConsumed = new AtomicInteger(0);
 		ScheduledExecutorService schExService = Executors.newScheduledThreadPool(1);
 		schExService.scheduleAtFixedRate(() -> {
-			logger.debug(Thread.currentThread().getId() + " in attemp: " + attemptsInMinutes.get());
+			logger.debug(Thread.currentThread().getId() + " in attemp: " + minutesDisconnected.get());
 			if (isConnected()) {
-				if (attemptsInMinutes.get() > 0 && attemptsInMinutes.get() < maximunAttempsInMinutes) {
-					logger.debug(Thread.currentThread().getId() + " extending minutes: " + attemptsInMinutes.get());
-					double hours = TimerUtil.getMinutesAsHours((long) attemptsInMinutes.get());
+				if (minutesDisconnected.get() > 0 && minutesDisconnected.get() < maximunAttempsInMinutes) {
+					logger.debug(Thread.currentThread().getId() + " minutes consumed before recharging: " + minutesConsumed.get());
+					logger.debug(Thread.currentThread().getId() + " extending minutes: " + minutesDisconnected.get());
+					double hours = TimerUtil.getMinutesAsHours((long) minutesDisconnected.get());
 					double balanceToExtend = TimerUtil.getBalance(TimerUtil.getHoursAsString(hours), tariff);
 					logger.debug(Thread.currentThread().getId() + " balance to extend: " + balanceToExtend);
 					NotificationDialog.extendTime(balanceToExtend);
 			        PWLauncher.updateBalance(balanceToExtend);
+			        minutesConsumed.set(minutesConsumed.get() - minutesDisconnected.get());
+			        logger.debug(Thread.currentThread().getId() + " minutes consumed after recharging: " + minutesConsumed.get());
 				}
 				endRentIfFileExists();
-				attemptsInMinutes.set(0);
+				minutesDisconnected.set(0);
 				deleteFile();
 			} else {
-				attemptsInMinutes.incrementAndGet();
+				int attempt = minutesDisconnected.incrementAndGet();
+				logger.debug("no connection, attempt: " + attempt);
 			}
-			if (attemptsInMinutes.get() == maximunAttempsInMinutes) {
-				logger.info(Thread.currentThread().getId() + " shutting down");
-				writeFile(clientId, timerUtil.getTotalHoursUsed(), tariff);
+			minutesConsumed.incrementAndGet();
+			
+			if (minutesDisconnected.get() == maximunAttempsInMinutes) {
+				logger.info(Thread.currentThread().getId() + " maximum number of disconection reached");
+				double hoursConsumed = TimerUtil.getMinutesAsHours(new Long(minutesConsumed.get()));
+				logger.debug("before writing file, hours consumed: " + hoursConsumed + ", based on minutes consumed: " + minutesConsumed.get());
+				writeFile(rentId, hoursConsumed, tariff);
+				PWLauncher.stopComputer();
 			}
 		}, 0, 1, TimeUnit.MINUTES);
 
+	}
+	
+	public static void main(String[] args) {
+		String a = "73|00:04|2.0";
+		String b[] = StringUtils.split(a, FILE_SEPARATOR);
+		System.out.println(b[0] + " - " + b[1] + " - " + b[2]);
 	}
 	
 	private static void endRentIfFileExists() {
@@ -62,12 +79,17 @@ public class InternetConnectionValidator {
 			if (Files.exists(path)) {
 				List<String> lines = Files.readAllLines(path);
 				lines.stream().forEach(l ->  {
-					String[] split = l.split(FILE_SEPARATOR);
-					new RentRest().endRentComputer(new Long(split[0]), split[1], split[2]);	
+					logger.debug("line: " + l);
+					String[] split = StringUtils.split(l, FILE_SEPARATOR);
+					Long rentId = new Long(split[0]);
+					String hoursConsumed = split[1];
+					String tariff = split[2];
+					logger.debug("data to end rent, rentId: " + rentId + ", hours consumed: " + hoursConsumed + ", tariff: " + tariff);
+					new RentRest().endRentComputer(rentId, hoursConsumed, tariff);	
 				});
 			}
-		} catch (IOException e) {
-			logger.debug(Thread.currentThread().getId() + " file can not be read");
+		} catch (final Exception e) {
+			logger.error(Thread.currentThread().getId() + " file can not be read. " + e.getMessage(), e);
 		}
 	}
 
@@ -75,16 +97,19 @@ public class InternetConnectionValidator {
 		Path path = Paths.get(PropertiesLoader.DEFAULT_PATH + NO_CONNECTION_FILE);
 		try {
 			Files.deleteIfExists(path);
-		} catch (IOException e) {
-			logger.debug(Thread.currentThread().getId() + " file can not be deleted");
+		} catch (final Exception e) {
+			logger.error(Thread.currentThread().getId() + " file can not be deleted. " + e.getMessage(), e);
 		}
 	}
 
-	private static void writeFile(Long clientId, double balanceUsed, double tariff) {
+	private static void writeFile(Long rentId, double hoursConsumed, double tariff) {
+		logger.info("writing in file, rentId: " + rentId + ", hours consumed: " + hoursConsumed + ", tariff: " + tariff);
 		Path path = Paths.get(PropertiesLoader.DEFAULT_PATH + NO_CONNECTION_FILE);
+		logger.info("writing file in path: " + path.toUri().getPath());
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) 
 		{
-		    writer.write(clientId + FILE_SEPARATOR + balanceUsed + FILE_SEPARATOR + tariff);
+		    writer.write(rentId + FILE_SEPARATOR + hoursConsumed + FILE_SEPARATOR + tariff);
+		    logger.info("file written");
 		} catch (IOException e) {
 			logger.debug(Thread.currentThread().getId() + " file can not be written");
 		}

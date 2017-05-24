@@ -42,6 +42,15 @@ public class TimerUtil {
         timer = new Timer(ONE_MINUTE, this.actionListener);
         timer.start();
     }
+    
+    public TimerUtil(Long minutesUsed) {
+    	this.minutesUsed = minutesUsed == null ? 0L : minutesUsed;
+    	this.actionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                decreaseTime();
+            }
+        };
+    }
 
     public void replaceActionListener(final ActionListener actionListener) {
         this.timer.removeActionListener(this.actionListener);
